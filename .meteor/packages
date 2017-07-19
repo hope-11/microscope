@@ -4,7 +4,7 @@
 # 'meteor add' and 'meteor remove' will edit this file for you,
 # but you can also edit it by hand.
 
-meteor-base@1.1.0             # Packages every Meteor app needs to have
+meteor-base@1.1.0             # Packages every Meteor app needs to havez
 mobile-experience@1.0.4       # Packages for a great mobile UX
 mongo@1.1.19                   # The database Meteor supports right now
 blaze-html-templates@1.0.4 # Compile .html files into Meteor Blaze views
@@ -22,3 +22,6 @@ twbs:bootstrap
 underscore@1.0.10
 iron:router
 sacha:spin
+session
+ian:accounts-ui-bootstrap-3
+accounts-password
