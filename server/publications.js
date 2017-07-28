@@ -1,8 +1,17 @@
 /**
  * Created by houpeng on 2017/7/15.
  */
-Meteor.publish('posts', function(){
-    return Posts.find();
+Meteor.publish('posts', function(options){
+    check(options, {
+        sort: Object,
+        limit: Number
+    });
+    return Posts.find({}, options);
+});
+
+Meteor.publish('singlePost', function (id) {
+    check(id, String);
+    return Posts.find(id);
 });
 
 Meteor.publish('comments', function (postId) {
@@ -11,5 +20,5 @@ Meteor.publish('comments', function (postId) {
 });
 
 Meteor.publish('notifications', function () {
-    return Notification.find();
+    return Notifications.find({userId: this.userId, read: false});
 });
