@@ -1,16 +1,18 @@
 <template name="gtbPage">
-    <div class="gtb-header container">
-        <div class="row">
-            <div class="col-md-12">
-                <h3 class="text-center">{{gtb.title}}</h3>
+    <div class="gtp-page">
+        <div class="gtb-header">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="text-center">{{gtb.title}}</h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-9"></div>
+                <div class="col-md-3">演唱：{{gtb.artist}}</div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-9"></div>
-            <div class="col-md-3">演唱：{{gtb.artist}}</div>
+        <div class="gtb-content" id="gtb-content">
+
         </div>
-    </div>
-    <div class="gtb-content" id="gtb-content">
-{{am}}
     </div>
 </template>

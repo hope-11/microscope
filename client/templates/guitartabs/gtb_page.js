@@ -109,19 +109,24 @@ var b={
     startFred: 2,
     finger: [
         {fred: 1, pick: [6, 1]},
-        {fred: 3 ,pick: [4]},
+        {fred: 3,pick: [4]},
         {fred: 3, pick: [3]},
         {fred: 3, pick: [2]},
         {}
     ]
 };
-
-var gtbData={
-    title: "我想我是海",
-    artist: "黄磊",
-    beats: []
-
+var d_2={
+    name: 'D(2)',
+    startFred: 2,
+    finger: [
+        {fred: 1, pick: [6, 1]},
+        {fred: 2,pick: [2]},
+        {fred: 3, pick: [4]},
+        {fred: 4, pick: [5]},
+        {}
+    ]
 };
+
 
 var drawChord=function (draw, chord, x0, y0, scale) {
 
@@ -152,7 +157,14 @@ var drawChord=function (draw, chord, x0, y0, scale) {
 
         //品格数量
         numFred: function () {
-            return 3;
+            var num = 3;
+            for(var i=0; i<chord.finger.length; i++){
+                var fred=chord.finger[i].fred;
+                if(fred > num){
+                    num = fred;
+                }
+            }
+            return num;
         },
         //图形宽度
         width: function () {
@@ -169,7 +181,7 @@ var drawChord=function (draw, chord, x0, y0, scale) {
             //指位编号所在品格的位置坐标，即Y轴坐标
             var y=this.y0 - this.height()                 //定位图形上端为0点
                 - this.rFinger                             //向上偏移指圆半径
-                - this.disFred / 2 + 1        //向上偏移半个品格间距
+                - this.disFred / 2       //向上偏移半个品格间距
                 + fred * this.disFred;                     //向下偏移品位*品距
 
             return {x: x, y: y};
@@ -179,18 +191,18 @@ var drawChord=function (draw, chord, x0, y0, scale) {
     //创建symbol
     var symbol = draw.symbol();
     //绘制弦
-    for (i = 0; i < 6; i++) {
+    for (i = 0; i < paramDefault.numPick; i++) {
         symbol.rect(paramDefault.widthLine, param.height())
             .move(param.x0 + i * param.disPick, param.y0-param.height());
     }
     //绘制品柱
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < param.numFred() + 1; i++) {
         symbol.rect(param.width(), paramDefault.widthLine)
             .move(param.x0, param.y0-i * param.disFred);
     }
 
     //绘制指位
-    for(i=0; i<paramDefault.numPick; i++){
+    for(i = 0; i < paramDefault.numPick; i++){
         //和弦中的手指
         var finger = chord.finger[i];
         //判断手指是否为空对象，如果是空对象，不执行
@@ -207,12 +219,17 @@ var drawChord=function (draw, chord, x0, y0, scale) {
                     .move(param.x0 - param.disPick , param.y0 - param.height() - param.sizeFingerText / 2 + param.disFred / 2);
             }
 
+            //如果pick数组长度为2，则为横按
             if(finger.pick[1]){
+                //横按起始弦位
                 var xFingerStart = posFinger.x + param.rFinger *5 / 4;
+                //横按结束弦位，一般为1弦
                 var xFingerEnd = param.posFinger(finger.fred, finger.pick[1]).x + param.rFinger ;
                 var yFinger = posFinger.y + param.rFinger;
+                //绘制横按图形，两端为圆的线，宽度为指圆半径的1/2
                 symbol.line(xFingerStart, yFinger, xFingerEnd, yFinger)
                     .stroke({width: param.rFinger, linecap: 'round'});
+                //绘制手指数字，在和弦图形相应品味的右侧
                 symbol.text(i + 1 + '')
                     .font({size: param.sizeFingerText, anchor: 'middle'})
                     .fill('#000')
@@ -237,12 +254,129 @@ var drawChord=function (draw, chord, x0, y0, scale) {
     draw.use(symbol);
 };
 
+var gtbData={
+    title: "我想我是海",
+    artist: "黄磊",
+    beats: [
+        {
+            syllable: {
+                pick: ['','1','2','3','4','5'],
+                note: 2,
+                ring: 0,
+                ringType: ''
+            },
+            chrod: am
+        },
+        {
+            syllable: {
+                pick: ['0','1','2','3','4','5'],
+                note: 2,
+                ring: 0,
+                ringType: ''
+            },
+            chrod: am
+        },
+        {
+            syllable: {
+                pick: ['0','1','2','3','4','5'],
+                note: 2,
+                ring: 0,
+                ringType: ''
+            },
+            chrod: am
+        },
+        {
+            syllable: {
+                pick: ['0','1','2','3','4','5'],
+                note: 2,
+                ring: 0,
+                ringType: ''
+            },
+            chrod: am
+        },
+        {
+            syllable: {
+                pick: ['0','1','2','3','4','5'],
+                note: 2,
+                ring: 0,
+                ringType: ''
+            },
+            chrod: am
+        }
+    ]
+
+};
+
+var symbols={
+    x: function (draw, x, y, scale) {
+        var symbol = draw.symbol();
+
+        var len = scale ? scale * 3 : 3;
+        var widthLine = scale ? scale * 1 : 1;
+
+        symbol.line(x, y, x + len, y + len).stroke({width: widthLine});
+        symbol.line(x, y, x + len, y - len).stroke({width: widthLine});
+        symbol.line(x, y, x - len, y + len).stroke({width: widthLine});
+        symbol.line(x, y, x - len, y - len).stroke({width: widthLine});
+
+        return symbol;
+    },
+    num: function (draw, x, y, num, sizeNum, scale) {
+        var symbol = draw.symbol();
+
+        var sizeText = scale ? scale * (sizeNum ? sizeNum : 10) : (sizeNum ? sizeNum : 10);
+
+        symbol.text(num + '')
+            .font({size: sizeText, anchor: 'middle'})
+            .fill('#000')
+            .move(x, y - sizeText / 2 -1);
+
+        return symbol;
+    }
+};
+
+var drawSyllable=function () {
+    var draw=SVG('gtb-content');
+
+    var paramDefault={
+        x0: 50,
+        y0: 50,
+        disPick: 9,
+        disNote:16,
+        widthLine: 1,
+        sizeText: 10
+    }
+
+
+draw.use(symbols.x(draw, 70, 50));
+draw.use(symbols.num(draw, 100, 50, 0));
+
+    draw.rect(paramDefault.widthLine, 46).move(paramDefault.x0, paramDefault.y0);
+
+    for(var i=0; i<6; i++){
+        draw.rect(100, paramDefault.widthLine).move(paramDefault.x0, paramDefault.y0+i*paramDefault.disPick);
+    }
+
+    for(var i=0; i<gtbData.beats.length; i++){
+        for(var j=0; j<6; j++){
+            if(gtbData.beats[0].syllable.pick[j]){
+                var text=draw.text('aaa');
+                    text.tspan(gtbData.beats[0].syllable.pick[j]).dy(paramDefault.sizeText/2)
+                    .font({size: paramDefault.sizeText, anchor: 'middle'})
+                    .move(paramDefault.x0+i*paramDefault.disNote, paramDefault.y0+j*paramDefault.disPick);
+            }
+        }
+    }
+
+}
+
 Template.gtbPage.helpers({
     gtb: gtbData
 });
 
 Template.gtbPage.onRendered(function () {
     var draw=SVG('gtb-content');
+    drawChord(draw, d_2, 10, 149);
     drawChord(draw, am, 100, 149);
     drawChord(draw, g, 200, 149);
     drawChord(draw, f7, 300, 149);
@@ -254,5 +388,5 @@ Template.gtbPage.onRendered(function () {
     drawChord(draw, g_3, 900, 149);
     drawChord(draw, b, 1000, 149);
 
-
+    drawSyllable();
 });
