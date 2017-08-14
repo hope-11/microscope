@@ -128,36 +128,24 @@ var d_2={
 };
 
 
-var drawChord=function (draw, chord, x0, y0, scale) {
+var drawChord=function (draw, chord, x0, y0) {
 
-    //在element上创建图形
-    //var draw = SVG(element);
-
-    //默认参数，左下角为(0, 0)
-    var paramDefault={
-        x0: 0,          //图形的绘制起点X轴坐标
-        y0: 0,          //图形的绘制起点Y轴坐标
+    //参数，左下角为(0, 0)
+    var param={
+        x0: x0 ? x0 : 0,
+        y0: y0 ? y0 : 0,
         disPick: 9,       //弦间距
         disFred: 16,      //品柱间距
         rFinger: 6,     //指位编号的背景圆形半径
         numPick: 6,      //弦数量
         widthLine: 1,    //绘图线宽
         sizeFingerText: 10,    //文字尺寸
-        sizeNameText: 16    //和弦名称文字尺寸
-    };
-
-    var param={
-        x0: x0 ? x0 : paramDefault.x0,
-        y0: y0 ? y0 : paramDefault.y0,
-        disPick: scale ? scale * paramDefault.disPick : paramDefault.disPick,
-        disFred: scale ? scale * paramDefault.disFred : paramDefault.disFred,
-        rFinger: scale ? scale * paramDefault.rFinger : paramDefault.rFinger,
-        sizeFingerText: scale ? scale * paramDefault.sizeFingerText : paramDefault.sizeFingerText,
-        sizeNameText: scale ? scale * paramDefault.sizeNameText : paramDefault.sizeNameText,
+        sizeNameText: 16,    //和弦名称文字尺寸
 
         //品格数量
         numFred: function () {
-            var num = 3;
+            var num = 3;    //默认3个品格
+            //遍历指位，有品位超过3的，则取代
             for(var i=0; i<chord.finger.length; i++){
                 var fred=chord.finger[i].fred;
                 if(fred > num){
@@ -168,7 +156,7 @@ var drawChord=function (draw, chord, x0, y0, scale) {
         },
         //图形宽度
         width: function () {
-            return this.disPick * (paramDefault.numPick - 1) + paramDefault.widthLine;
+            return this.disPick * (this.numPick - 1) + this.widthLine;
         },
         //图形高度
         height: function () {
@@ -177,7 +165,7 @@ var drawChord=function (draw, chord, x0, y0, scale) {
         //指位编号的位置坐标，fred-品，pick-弦
         posFinger: function (fred, pick) {
             //指位编号所在弦的位置坐标，即X轴坐标
-            var x=this.x0 - this.rFinger + (paramDefault.numPick - pick) * this.disPick;
+            var x=this.x0 - this.rFinger + (this.numPick - pick) * this.disPick;
             //指位编号所在品格的位置坐标，即Y轴坐标
             var y=this.y0 - this.height()                 //定位图形上端为0点
                 - this.rFinger                             //向上偏移指圆半径
@@ -191,18 +179,18 @@ var drawChord=function (draw, chord, x0, y0, scale) {
     //创建symbol
     var symbol = draw.symbol();
     //绘制弦
-    for (i = 0; i < paramDefault.numPick; i++) {
-        symbol.rect(paramDefault.widthLine, param.height())
+    for (var i = 0; i < param.numPick; i++) {
+        symbol.rect(param.widthLine, param.height())
             .move(param.x0 + i * param.disPick, param.y0-param.height());
     }
     //绘制品柱
-    for (i = 0; i < param.numFred() + 1; i++) {
-        symbol.rect(param.width(), paramDefault.widthLine)
+    for ( var i = 0; i < param.numFred() + 1; i++) {
+        symbol.rect(param.width(), param.widthLine)
             .move(param.x0, param.y0-i * param.disFred);
     }
 
     //绘制指位
-    for(i = 0; i < paramDefault.numPick; i++){
+    for(var i = 0; i < param.numPick; i++){
         //和弦中的手指
         var finger = chord.finger[i];
         //判断手指是否为空对象，如果是空对象，不执行
@@ -251,7 +239,7 @@ var drawChord=function (draw, chord, x0, y0, scale) {
         .font({size: param.sizeNameText, anchor: 'middle'})
         .move(param.x0 + param.width() / 2, param.y0 - param.height() - param.sizeNameText -1);
 
-    draw.use(symbol);
+    return symbol;
 };
 
 var gtbData={
@@ -387,17 +375,17 @@ Template.gtbPage.helpers({
 
 Template.gtbPage.onRendered(function () {
     var draw=SVG('gtb-content');
-    drawChord(draw, d_2, 10, 149);
-    drawChord(draw, am, 100, 149);
-    drawChord(draw, g, 200, 149);
-    drawChord(draw, f7, 300, 149);
-    drawChord(draw, e, 400, 149);
-    drawChord(draw, c, 500, 149);
-    drawChord(draw, f, 600, 149);
-    drawChord(draw, am_5, 700, 149);
-    drawChord(draw, am_f, 800, 149);
-    drawChord(draw, g_3, 900, 149);
-    drawChord(draw, b, 1000, 149);
+    draw.use(drawChord(draw, d_2, 10, 149));
+    draw.use(drawChord(draw, am, 100, 149));
+    draw.use(drawChord(draw, g, 200, 149));
+    draw.use(drawChord(draw, f7, 300, 149));
+    draw.use(drawChord(draw, e, 400, 149));
+    draw.use(drawChord(draw, c, 500, 149));
+    draw.use(drawChord(draw, f, 600, 149));
+    draw.use(drawChord(draw, am_5, 700, 149));
+    draw.use(drawChord(draw, am_f, 800, 149));
+    draw.use(drawChord(draw, g_3, 900, 149));
+    draw.use(drawChord(draw, b, 1000, 149));
 
     drawSyllable();
 });
