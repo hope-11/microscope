@@ -332,6 +332,16 @@ var symbols={
             .move(x, y - sizeText / 2 -1);
 
         return symbol;
+    },
+    sweep: function (draw, x, yStart, yEnd, scale) {
+        var symbol = draw.symbol();
+
+        symbol.polyline([x, yStart], [x, yEnd])
+            .fill("none")
+            .stroke({ color: '#000', width: 1});
+
+        return symbol;
+
     }
 };
 
@@ -350,6 +360,7 @@ var drawSyllable=function () {
 
 draw.use(symbols.x(draw, 70, 50));
 draw.use(symbols.num(draw, 100, 50, 0));
+draw.use(symbols.sweep(draw, 130, 80, 50));
 
     draw.rect(paramDefault.widthLine, 46).move(paramDefault.x0, paramDefault.y0);
 
