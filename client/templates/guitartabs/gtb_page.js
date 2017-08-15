@@ -243,16 +243,33 @@ var drawChord=function (draw, chord, x0, y0) {
 };
 
 var ChordSymbol = function(element, chord){
+    //画板元素ID
     this.element = element;
+    //所绘制和弦
     this.chord = chord;
 
-    this._pickDistance = 9;       //弦间距
-    this._fredDistance = 16;      //品柱间距
-    this._fingerCircleRadius = 6;     //指位编号的背景圆形半径
-    this._pickNumber = 6;      //弦数量
-    this._lineWidth = 1;    //绘图线宽
-    this._fingerTextSize = 10;    //文字尺寸
-    this._nameTextSize = 16;    //和弦名称文字尺寸
+    //弦间距
+    this._pickDistance = 9;
+    //品柱间距
+    this._fredDistance = 16;
+    //指位编号的背景圆形半径
+    this._fingerCircleRadius = 6;
+    //弦数量
+    this._pickNumber = 6;
+    //绘图线宽
+    this._lineWidth = 1;
+
+    //手指符号文字
+    this._fingerTextFont = {
+        size: 12,                   //文字尺寸
+        weight: 'bold',             //粗体
+        anchor: 'middle'            //居中
+    };
+    //和弦名称文字
+    this._nameTextFont = {
+        size: 16,                   //文字尺寸
+        anchor: 'middle'            //居中
+    }
 };
 ChordSymbol.prototype._getGridWidth = function(){
     return this._pickDistance * (this._pickNumber - 1) + this._lineWidth;
@@ -277,8 +294,8 @@ ChordSymbol.prototype._getNameTextPosition = function () {
     return {x: x, y: y};
 };
 ChordSymbol.prototype._getGridOrigin = function(){
-    var x = this._nameTextSize;
-    var y = this._nameTextSize;
+    var x = this._nameTextFont.size;
+    var y = this._nameTextFont.size;
     return {x: x, y: y};
 };
 ChordSymbol.prototype._getFingerCirclePosition = function(fred, pick){
@@ -300,8 +317,8 @@ ChordSymbol.prototype.drawChordSymbol = function(){
     var fingerCircleRadius = this._fingerCircleRadius;
     var pickNumber = this._pickNumber;
     var lineWidth = this._lineWidth;
-    var fingerTextSize = this._fingerTextSize;
-    var nameTextSize = this._nameTextSize;
+    var fingerTextFont = this._fingerTextFont;
+    var nameTextFont = this._nameTextFont;
 
     var gridWidth = this._getGridWidth();
     var gridHeight = this._getGridHeight();
@@ -311,7 +328,7 @@ ChordSymbol.prototype.drawChordSymbol = function(){
 
     //绘制和弦名称
     symbol.text(chord.name)
-        .font({size: nameTextSize, anchor: 'middle'})
+        .font(nameTextFont)
         .move(nameTextPosition.x, nameTextPosition.y);
 
     //绘制弦
@@ -335,12 +352,12 @@ ChordSymbol.prototype.drawChordSymbol = function(){
             var fingerCirclePosition = this._getFingerCirclePosition(finger.fred, finger.pick[0]);
 
             //只有起始品位存在并且不为1时才标记，起始品位，否则不需标记
-            if(chord.startFred && chord.startFred != 1){
+            if(chord.startFred && chord.startFred !== 1){
                 //绘制起始品位
                 symbol.text(chord.startFred + '')
-                    .font({size: fingerTextSize})
+                    .font(fingerTextFont)
                     .fill('#000')
-                    .move(gridOrigin.x - pickDistance , gridOrigin.y + fredDistance / 2 - fingerTextSize / 2);
+                    .move(gridOrigin.x - pickDistance / 2, gridOrigin.y + fredDistance / 2 - fingerTextFont.size / 2);
             }
 
             //如果pick数组长度为2，则为横按
@@ -354,9 +371,9 @@ ChordSymbol.prototype.drawChordSymbol = function(){
                 //绘制横按图形，两端为圆的线，宽度为指圆半径的1/2
                 symbol.line(xFingerStart, yFinger, xFingerEnd, yFinger)
                     .stroke({width: fingerCircleRadius, linecap: 'round'});
-                //绘制手指数字，在和弦图形相应品味的右侧
+                //绘制手指数字，在和弦图形相应品位的右侧
                 symbol.text(i + 1 + '')
-                    .font({size: fingerTextSize, anchor: 'middle'})
+                    .font(fingerTextFont)
                     .fill('#000')
                     .move(xFingerEnd + fingerCircleRadius, fingerCirclePosition.y);
             }else {
@@ -364,7 +381,7 @@ ChordSymbol.prototype.drawChordSymbol = function(){
                 symbol.circle(fingerCircleRadius * 2)
                     .move(fingerCirclePosition.x, fingerCirclePosition.y);
                 symbol.text(i + 1 + '')
-                    .font({size: fingerTextSize, anchor: 'middle'})
+                    .font(fingerTextFont)
                     .fill('#fff')
                     .move(fingerCirclePosition.x + fingerCircleRadius, fingerCirclePosition.y);
             }
