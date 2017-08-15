@@ -242,6 +242,138 @@ var drawChord=function (draw, chord, x0, y0) {
     return symbol;
 };
 
+var ChordSymbol = function(element, chord){
+    this.element = element;
+    this.chord = chord;
+
+    this._pickDistance = 9;       //弦间距
+    this._fredDistance = 16;      //品柱间距
+    this._fingerCircleRadius = 6;     //指位编号的背景圆形半径
+    this._pickNumber = 6;      //弦数量
+    this._lineWidth = 1;    //绘图线宽
+    this._fingerTextSize = 10;    //文字尺寸
+    this._nameTextSize = 16;    //和弦名称文字尺寸
+};
+ChordSymbol.prototype._getGridWidth = function(){
+    return this._pickDistance * (this._pickNumber - 1) + this._lineWidth;
+};
+ChordSymbol.prototype._getGridHeight = function() {
+    return this._fredDistance * this._getFredNumber();
+};
+ChordSymbol.prototype._getFredNumber = function(){
+    var num = 3;    //默认3个品格
+    //遍历和弦指位元素，有品位超过3的，则取代
+    for(var i = 0; i < this.chord.finger.length; i++){
+        var fred = this.chord.finger[i].fred;
+        if(fred > num){
+            num = fred;
+        }
+    }
+    return num;
+};
+ChordSymbol.prototype._getNameTextPosition = function () {
+    var x = this._getGridOrigin().x + this._getGridWidth() / 2;
+    var y = 0;
+    return {x: x, y: y};
+};
+ChordSymbol.prototype._getGridOrigin = function(){
+    var x = this._nameTextSize;
+    var y = this._nameTextSize;
+    return {x: x, y: y};
+};
+ChordSymbol.prototype._getFingerCirclePosition = function(fred, pick){
+    //指位编号所在弦的位置坐标，即X轴坐标，（弦总数 - 弦号） * 弦距 - 指圆半径
+    var x = this._getGridOrigin().x + (this._pickNumber - pick) * this._pickDistance - this._fingerCircleRadius;
+    //指位编号所在品格的位置坐标，即Y轴坐标，（品位号 * 品距） - 半个品距 - 指圆半径
+    var y = this._getGridOrigin().y + fred * this._fredDistance - this._fredDistance / 2 - this._fingerCircleRadius;
+    return {x: x, y: y};
+
+};
+ChordSymbol.prototype.drawChordSymbol = function(){
+    //创建symbol
+    var symbol = this.element.symbol();
+
+    var chord = this.chord;
+
+    var pickDistance = this._pickDistance;
+    var fredDistance = this._fredDistance;
+    var fingerCircleRadius = this._fingerCircleRadius;
+    var pickNumber = this._pickNumber;
+    var lineWidth = this._lineWidth;
+    var fingerTextSize = this._fingerTextSize;
+    var nameTextSize = this._nameTextSize;
+
+    var gridWidth = this._getGridWidth();
+    var gridHeight = this._getGridHeight();
+    var fredNumber = this._getFredNumber();
+    var nameTextPosition = this._getNameTextPosition();
+    var gridOrigin = this._getGridOrigin();
+
+    //绘制和弦名称
+    symbol.text(chord.name)
+        .font({size: nameTextSize, anchor: 'middle'})
+        .move(nameTextPosition.x, nameTextPosition.y);
+
+    //绘制弦
+    for (var i = 0; i < pickNumber; i++) {
+        symbol.rect(lineWidth, gridHeight)
+            .move(gridOrigin.x + pickDistance * i, gridOrigin.y);
+    }
+    //绘制品柱
+    for ( var i = 0; i < fredNumber + 1; i++) {
+        symbol.rect(gridWidth, lineWidth)
+            .move(gridOrigin.x, gridOrigin.y +  fredDistance * i);
+    }
+
+    //绘制指位
+    for(var i = 0; i < pickNumber; i++){
+        //和弦中的手指
+        var finger = chord.finger[i];
+        //判断手指是否为空对象，如果是空对象，不执行
+        if(!$.isEmptyObject(finger)){
+            //指位坐标
+            var fingerCirclePosition = this._getFingerCirclePosition(finger.fred, finger.pick[0]);
+
+            //只有起始品位存在并且不为1时才标记，起始品位，否则不需标记
+            if(chord.startFred && chord.startFred != 1){
+                //绘制起始品位
+                symbol.text(chord.startFred + '')
+                    .font({size: fingerTextSize})
+                    .fill('#000')
+                    .move(gridOrigin.x - pickDistance , gridOrigin.y + fredDistance / 2 - fingerTextSize / 2);
+            }
+
+            //如果pick数组长度为2，则为横按
+            if(finger.pick[1]){
+                //横按起始弦位
+                var xFingerStart = fingerCirclePosition.x + fingerCircleRadius * 5 / 4;
+                //横按结束弦位，一般为1弦
+                var xFingerEnd = this._getFingerCirclePosition(finger.fred, finger.pick[1]).x + fingerCircleRadius;
+
+                var yFinger = fingerCirclePosition.y + fingerCircleRadius;
+                //绘制横按图形，两端为圆的线，宽度为指圆半径的1/2
+                symbol.line(xFingerStart, yFinger, xFingerEnd, yFinger)
+                    .stroke({width: fingerCircleRadius, linecap: 'round'});
+                //绘制手指数字，在和弦图形相应品味的右侧
+                symbol.text(i + 1 + '')
+                    .font({size: fingerTextSize, anchor: 'middle'})
+                    .fill('#000')
+                    .move(xFingerEnd + fingerCircleRadius, fingerCirclePosition.y);
+            }else {
+                //绘制指圆图形
+                symbol.circle(fingerCircleRadius * 2)
+                    .move(fingerCirclePosition.x, fingerCirclePosition.y);
+                symbol.text(i + 1 + '')
+                    .font({size: fingerTextSize, anchor: 'middle'})
+                    .fill('#fff')
+                    .move(fingerCirclePosition.x + fingerCircleRadius, fingerCirclePosition.y);
+            }
+        }
+    }
+
+    return symbol;
+};
+
 var gtbData={
     title: "我想我是海",
     artist: "黄磊",
@@ -292,7 +424,6 @@ var gtbData={
             chrod: am
         }
     ]
-
 };
 
 var symbols={
@@ -374,7 +505,7 @@ Template.gtbPage.helpers({
 });
 
 Template.gtbPage.onRendered(function () {
-    var draw=SVG('gtb-content');
+    var draw=SVG('gtb-content').size(1000, 300);
     draw.use(drawChord(draw, d_2, 10, 149));
     draw.use(drawChord(draw, am, 100, 149));
     draw.use(drawChord(draw, g, 200, 149));
@@ -382,10 +513,15 @@ Template.gtbPage.onRendered(function () {
     draw.use(drawChord(draw, e, 400, 149));
     draw.use(drawChord(draw, c, 500, 149));
     draw.use(drawChord(draw, f, 600, 149));
-    draw.use(drawChord(draw, am_5, 700, 149));
-    draw.use(drawChord(draw, am_f, 800, 149));
-    draw.use(drawChord(draw, g_3, 900, 149));
-    draw.use(drawChord(draw, b, 1000, 149));
+    //draw.use(drawChord(draw, am_5, 700, 149));
+    //draw.use(drawChord(draw, am_f, 800, 149));
+    //draw.use(drawChord(draw, g_3, 900, 149));
+    //draw.use(drawChord(draw, b, 1000, 149));
+    var amChordSymbol = new ChordSymbol(draw, am);
+    var d_2ChordSymbol = new ChordSymbol(draw, d_2);
+    draw.use(amChordSymbol.drawChordSymbol().move(700, 100));
+    draw.use(d_2ChordSymbol.drawChordSymbol().move(800, 100));
 
     drawSyllable();
+
 });
