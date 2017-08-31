@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "svg.js": {
+      "version": "2.6.3",
+      "resolved": "https://registry.npmjs.org/svg.js/-/svg.js-2.6.3.tgz",
+      "from": "svg.js@2.6.3"
+    }
+  }
+}
