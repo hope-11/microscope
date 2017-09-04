@@ -152,20 +152,20 @@ SVG.Chord = SVG.invent({
                 .move(nameTextPosition.x, nameTextPosition.y);
 
             //绘制弦
-            for (var i = 0; i < wireNumber; i++) {
+            for (var i = 0, n = wireNumber; i < n; i++) {
                 this.rect(lineWidth, gridHeight)
                     .move(gridOrigin.x + wireDistance * i, gridOrigin.y);
             }
 
             //绘制品柱
-            for (var i = 0; i < fredNumber + 1; i++) {
+            for (var i = 0, n = fredNumber; i < n + 1; i++) {
                 //console.log(this)
                 this.rect(gridWidth, lineWidth)
                     .move(gridOrigin.x, gridOrigin.y + fredDistance * i);
             }
 
             //绘制指位
-            for (var i = 0; i < chord.fingers.length; i++) {
+            for (var i = 0, n = chord.fingers.length; i < n; i++) {
                 //console.log(this)
                 //和弦中的手指
                 var finger = chord.fingers[i];
@@ -256,31 +256,37 @@ SVG.Picked = SVG.invent({
          * 数字样式
          */
         numFont: {
-            size: 16,
+            size: 15,
             anchor: 'middle'
         },
 
 
 
         /**
-         * 绘制x样式击弦图形
+         * 绘制x样式的击弦图形
          * @param x
          * @param y
          * @returns {SVG.Picked}
          */
-        pickX: function (x, y) {
+        pickX: function () {
             var origin = this.origin();
-            var height = this.height;
+            var height = this.height * 0.8;
 
+            //绘制两条交叉线
             this.line(origin.x, origin.y, origin.x + height, origin.y + height).stroke(this.lineStroke);
             this.line(origin.x, origin.y + height, origin.x + height, origin.y).stroke(this.lineStroke);
 
-            //将图形原点移动到两条线的交叉点
+            //将两条线的交叉点作为图形原点
             this.move( - height / 2 - origin.x,  - height / 2 - origin.y + 0.5);
 
             return this;
         },
 
+        /**
+         * 绘制数字样式的击弦图形
+         * @param num
+         * @returns {SVG.Picked}
+         */
         pickNum: function (num) {
             var origin = this.origin();
             var numFont = this.numFont;
@@ -291,51 +297,187 @@ SVG.Picked = SVG.invent({
                 .move(x - 5, y);
             */
 
+            //绘制文字，并将文字上移半个字高
             this.text(num + '')
                 .font(numFont)
                 .fill('#000')
                 .move(origin.x, origin.y - numFont.size / 2 );
 
+            //将文字中心作为图形原点
             this.move(- origin.x, - origin.y);
 
             return this;
         },
 
-        pickO: function () {
+        /**
+         * 绘制击弦样式的击弦图形
+         * @returns {SVG.Picked}
+         */
+        pickSlap: function () {
             var origin = this.origin();
 
-            var width = this.height;
-            var height = this.height * 2;
+            //外圈宽度
+            var width = this.height * 0.8;
+            //外圈高度
+            var height = this.height * 2 * 0.8;
+            //外圈举行圆角半径
             var r = width / 2;
 
+            //绘制外圈圆角矩形
             this.rect(width, height)
-                .stroke({width: 1})
+                .stroke(this.lineStroke)
                 .fill({color: '#fff', opacity: 0})
                 .radius(r)
                 .move(origin.x, origin.y);
 
+            //绘制圈内交叉线
             this.line(origin.x, origin.y + r, origin.x + width, origin.y + height - r).stroke(this.lineStroke);
             this.line(origin.x, origin.y + height - r, origin.x + width, origin.y + r).stroke(this.lineStroke);
 
+            //将两条线的交叉点作为图形原点
             this.move( - width / 2 - origin.x,  - height / 2 - origin.y + 0.5);
+
+            return this;
+        },
+
+        /**
+         * 扫弦样式
+         * @param origin 绘图起点
+         * @param lineLength 线长
+         * @returns {SVG.Picked}
+         */
+        sweepStyle: function (origin, lineLength) {
+            //绘制一条直线
+            this.line(origin.x, origin.y, origin.x, origin.y + lineLength).stroke(this.lineStroke);
+
+            return this;
+        },
+
+        /**
+         * 琶音样式
+         * @param origin 绘图起点
+         * @param lineLength 线长
+         * @returns {SVG.Picked}
+         */
+        rassStyle: function (origin, lineLength) {
+            //曲线单边宽度
+            var rassWidth = this.height / 6;
+            //曲线每小节高度
+            var rassHeight = this.height / 6;
+
+            //定义曲线路径数组
+            var pathArray = [];
+            //曲线起点
+            pathArray.push('M', origin.x, origin.y);
+            //二次贝塞尔曲线第一段
+            pathArray.push('Q', origin.x + rassWidth, origin.y + rassHeight, origin.x, origin.y + rassHeight * 2);
+            //重复二次贝塞尔曲线，直到达到定义高度
+            for (var i = 4, n = lineLength / rassHeight; i <= n; i+=2){
+                pathArray.push('T', origin.x, origin.y + rassHeight * i);
+            }
+
+            //绘制此二次贝塞尔曲线
+            this.path(pathArray)
+                .fill('none')
+                .stroke(this.lineStroke);
+
+            return this;
+        },
+
+        /**
+         * 箭头样式
+         * @param origin 绘图起点
+         * @param lineLength 线长
+         * @param up Boolean类型，true为向上，false为向下
+         * @returns {SVG.Picked}
+         */
+        arrowStyle: function (origin, lineLength ,up) {
+            //箭头单边宽度
+            var arrowWidth = this.height / 4;
+            //箭头高度
+            var arrowHeight = this.height / 2;
+
+            if (up) {
+                //绘制向上箭头
+                this.line(origin.x, origin.y, origin.x - arrowWidth, origin.y + arrowHeight).stroke(this.lineStroke);
+                this.line(origin.x, origin.y, origin.x + arrowWidth, origin.y + arrowHeight).stroke(this.lineStroke);
+            } else {
+                //绘制向下箭头
+                this.line(origin.x, origin.y + lineLength, origin.x - arrowWidth, origin.y + lineLength - arrowHeight).stroke(this.lineStroke);
+                this.line(origin.x, origin.y + lineLength, origin.x + arrowWidth, origin.y + lineLength - arrowHeight).stroke(this.lineStroke);
+            }
+
+            return this;
+        },
+
+        /**
+         * 绘制扫弦图形
+         * @param sweep 'sweep'为扫弦，'rass'为琶音，如果有其他值则默认为扫弦
+         * @param step 跨step个弦位
+         * @param up Boolean类型，true为向上，false为向下
+         * @returns {SVG.Picked}
+         */
+        pickSweep: function (sweep, step, up) {
+            //绘图起点
+            var origin = this.origin();
+            //线长
+            var lineLength = this.height * step;
+
+            switch (sweep) {
+                case 'rass':
+                    //绘制琶音曲线
+                    this.rassStyle(origin, lineLength);
+                    break;
+                default:
+                    //默认绘制扫弦线
+                    this.sweepStyle(origin, lineLength);
+            }
+
+            //绘制箭头
+            this.arrowStyle(origin, lineLength, up);
+
+            //将绘图起点作为图形的原点
+            this.move(- origin.x, - origin.y);
+
+            return this;
+        },
+        handle: function () {
+            var origin = this.origin();
+
+            var lineHeight = this.height;
+
+            this.line(origin.x, origin.y, origin.x, origin.y + lineHeight).stroke(this.lineStroke);
+
+            this.move(- origin.x, - origin.y - lineHeight / 2);
 
             return this;
         }
 
     },
     construct: {
-        picked: function (pick) {
-            var symbol = this.put(new SVG.Picked);
-
-            if (!isNaN(pick)) {
-                symbol.pickNum(pick);
-            } else if (pick === 'o'){
-                symbol.pickO();
-            } else {
-                symbol.pickX();
-            }
-
-            return symbol;
+        pickedX: function () {
+            return this.put(new SVG.Picked).pickX();
+        },
+        pickedSlap: function () {
+            return this.put(new SVG.Picked).pickSlap();
+        },
+        pickedNum: function (num) {
+            return this.put(new SVG.Picked).pickNum(num);
+        },
+        pickedSweepUp: function (step) {
+            return this.put(new SVG.Picked).pickSweep('sweep', step, true);
+        },
+        pickedSweepDown: function (step) {
+            return this.put(new SVG.Picked).pickSweep('sweep', step, false);
+        },
+        pickedRassUp: function (step) {
+            return this.put(new SVG.Picked).pickSweep('rass', step, true);
+        },
+        pickedRassDown: function (step) {
+            return this.put(new SVG.Picked).pickSweep('rass', step, false);
+        },
+        handled: function () {
+            return this.put(new SVG.Picked).handle();
         }
     }
 });
