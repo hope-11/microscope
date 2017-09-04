@@ -310,13 +310,11 @@ Template.gtbPage.onRendered(function () {
 
             }
 
+        }
+        var chord = beats[i].chord;
+        if (typeof(chord) === 'object') {
+            draw.use(draw.chord(chord)).move(x, 100);
 
-            if (beats[i].chord) {
-                var chord = beats[i].chord;
-                console.log(chord)
-                draw.use(draw.chord(chord)).move(x, 100);
-
-            }
         }
 
     }

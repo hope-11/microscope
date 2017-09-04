@@ -212,7 +212,7 @@ SVG.Chord = SVG.invent({
             }
 
             //原点移动到网格左下角
-            this.move( - gridOrigin.x,  - gridOrigin.y - gridHeight)
+            this.move( - gridOrigin.x - wireDistance * 2/3,  - gridOrigin.y - gridHeight)
 
             return this;
         }
