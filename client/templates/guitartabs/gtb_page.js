@@ -16,6 +16,17 @@ var chordData = {
             {}
         ]
     },
+    em: {
+        name: 'Em',
+        startFred: 1,
+        fingers: [
+            {},
+            {fred: 2, pick: [5]},
+            {fred: 2, pick: [4]},
+            {},
+            {}
+        ]
+    },
     g: {
         name: 'G',
         startFred: 1,
@@ -57,6 +68,17 @@ var chordData = {
             {fred: 2, pick: [4]},
             {fred: 3, pick: [6]},
             {fred: 3, pick: [5]},
+            {}
+        ]
+    },
+    d: {
+        name: 'D',
+        startFred: 1,
+        fingers: [
+            {fred: 2, pick: [3]},
+            {fred: 2, pick: [1]},
+            {fred: 3, pick: [2]},
+            {},
             {}
         ]
     },
@@ -128,235 +150,303 @@ var chordData = {
     }
 };
 
-var gtbData={
-    title: "我想我是海",
-    artist: "黄磊",
-    beats: [
-        {syllable: {picks: ['','','','','x',''], note: 2, ring: 0, ringType: ''}, chord: chordData.am},
-        {syllable: {picks: ['','','','x','',''], note: 2, ring: 0, ringType: ''}},
-        {syllable: {picks: ['','','x','','',''], note: 2, ring: 0, ringType: ''}},
-        {syllable: {picks: ['','x','','','',''], note: 2, ring: 0, ringType: ''}},
-        {syllable: {picks: ['','','x','','',''], note: 2, ring: 0, ringType: ''}},
-        {syllable: {picks: ['','','','x','',''], note: 2, ring: 0, ringType: ''}},
-        {syllable: {picks: ['','','','','x',''], note: 2, ring: 0, ringType: ''}, chord: chordData.f7},
-        {syllable: {picks: ['','','','x','',''], note: 2, ring: 0, ringType: ''}},
-        {syllable: {picks: ['','','x','','',''], note: 2, ring: 0, ringType: ''}},
-        {syllable: {picks: ['','x','','','',''], note: 2, ring: 0, ringType: ''}},
-        {syllable: {picks: ['','','x','','',''], note: 2, ring: 0, ringType: ''}},
-        {syllable: {picks: ['','','','x','',''], note: 2, ring: 0, ringType: ''}}
+var gtbData2 = {
+    title: '平凡之路',
+    artist: '朴树',
+    notePerBeat: 4,
+    beatPerBar: 4,
+    guitarTabs: [
+        [
+            [
+                {picks: ['x','','','','',''], chord: chordData.em},
+                {picks: ['','','x','','','']},
+                {picks: ['','','','','x','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','x','','','',''], chord: chordData.c},
+                {picks: ['','','x','','','']},
+                {picks: ['','','','','x','']},
+                {picks: ['','','','x','','']}
+            ],
+            [
+                {picks: ['x','','','','',''], chord: chordData.g},
+                {picks: ['','','x','','','']},
+                {picks: ['','','','','x','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','','4','','']},
+                {picks: ['','','','','2','']},
+                {picks: ['','','','','0','']},
+                {picks: ['','','','','0','']}
+            ],
+            [
+                {picks: ['x','','','','',''], chord: chordData.em},
+                {picks: ['','','x','','','']},
+                {picks: ['','','','','x','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','x','','','',''], chord: chordData.c},
+                {picks: ['','','x','','','']},
+                {picks: ['','','','','x','']},
+                {picks: ['','','','x','','']}
+            ],
+            [
+                {picks: ['x','','','','',''], chord: chordData.g},
+                {picks: ['','','x','','','']},
+                {picks: ['','','','','x','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','','4','','']},
+                {picks: ['','','','','2','']},
+                {picks: ['','','','','0','']},
+                {picks: ['','','','','0','']}
+            ],
+            [
+                {picks: ['S','','','s','',''], noteTimer: 32, chord: chordData.em},
+                //{picks: ['S','','','s','','']},
+                {picks: ['','','S','','','s']},
+                {picks: ['','','S','','','s'], noteTimer: 8},
+                {picks: ['','','s','','','S'], noteTimer: 8},
+                {picks: ['S','','','s','',''], chord: chordData.c},
+                {picks: ['S','','','s','','']},
+                {picks: ['','','S','','','s']},
+                {picks: ['','','S','','','s'], noteTimer: 8},
+                {picks: ['','','s','','','S'], noteTimer: 8}
+            ],
+            [
+                {picks: ['S','','','s','',''], chord: chordData.g},
+                {picks: ['S','','','s','','']},
+                {picks: ['','','S','','','s']},
+                {picks: ['','','S','','','s'], noteTimer: 8},
+                {picks: ['','','s','','','S'], noteTimer: 8},
+                {picks: ['S','','','s','',''], chord: chordData.d},
+                {picks: ['S','','','s','','']},
+                {picks: ['','','S','','','s']},
+                {picks: ['','','S','','','s'], noteTimer: 8},
+                {picks: ['','','s','','','S'], noteTimer: 8}
+            ],
+            [
+                {picks: ['S','','','s','',''], chord: chordData.em},
+                {picks: ['S','','','s','',''], noteTimer: 32},
+                {picks: ['','','S','','','s']},
+                {picks: ['','','S','','','s'], noteTimer: 32},
+                {picks: ['','','s','','','S'], noteTimer: 32},
+                //{picks: ['S','','','s','',''], chord: chordData.c},
+                //{picks: ['S','','','s','','']},
+                //{picks: ['','','S','','','s']},
+                //{picks: ['','','S','','','s'], noteTimer: 8},
+                //{picks: ['','','s','','','S'], noteTimer: 8}
+            ],
+            [
+                {picks: ['S','','','s','',''], chord: chordData.g},
+                {picks: ['S','','','s','','']},
+                {picks: ['','','S','','','s']},
+                {picks: ['','','S','','','s'], noteTimer: 8},
+                {picks: ['','','s','','','S'], noteTimer: 8},
+                {picks: ['S','','','s','',''], chord: chordData.d},
+                {picks: ['S','','','s','','']},
+                {picks: ['','','S','','','s']},
+                {picks: ['','','S','','','s'], noteTimer: 8},
+                {picks: ['','','s','','','S'], noteTimer: 8}
+            ]
+        ]
     ]
 };
 
+var gtbData3={
+    title: "我想我是海",
+    artist: "黄磊",
+    notePerBeat: 8,     //8分音符为一拍
+    beatPerBar: 6,      //每小节有6拍
+    guitarTabs: [       //吉他谱谱，可能有多个吉他谱和简谱
+        [
+            [
+                {picks: ['','x','','','',''], noteTimer: 4, chord: chordData.am},
+                {picks: ['','x','','','',''], noteTimer: 4},
+                {picks: ['','','x','','',''], noteTimer: 4},
+                {picks: ['','','x','','',''], noteTimer: 4},
+                {picks: ['','','','x','','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','','','x','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','x','','',''], noteTimer: 8},
+                {picks: ['','','x','','',''], noteTimer: 8},
+            ],
+            [
+                {picks: ['','x','','','',''], chord: chordData.f7},
+                {picks: ['','','x','','','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','','','x','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','x','','','']}
+            ],
+            [
+                {picks: ['','x','','','',''], chord: chordData.am},
+                {picks: ['','','x','','',''], noteTimer: 8},
+                {picks: ['','','','x','','']},
+                {picks: ['','','x','','',''], noteTimer: 8},
+                {picks: ['','','','','x','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','x','','',''], noteTimer: 8},
+                {picks: ['','','x','','',''], noteTimer: 8}
+            ],
+            [
+                {picks: ['','x','','','',''], noteTimer: 8, chord: chordData.am},
+                {picks: ['','x','','','',''], noteTimer: 8},
+                {picks: ['','','x','','','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','','','x','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','x','','',''], noteTimer: 8},
+                {picks: ['','','x','','',''], noteTimer: 8},
+            ],
+            [
+                {picks: ['','x','','','',''], chord: chordData.f7},
+                {picks: ['','','x','','','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','','','x','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','x','','','']}
+            ],
+            [
+                {picks: ['','x','','','',''], noteTimer: 8, chord: chordData.am},
+                {picks: ['','','x','','',''], noteTimer: 8},
+                {picks: ['','','x','','','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','','','x','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','x','','',''], noteTimer: 8},
+                {picks: ['','','x','','',''], noteTimer: 8}
+            ],
+            [
+                {picks: ['','x','','','',''], noteTimer: 8, chord: chordData.am},
+                {picks: ['','x','','','',''], noteTimer: 8},
+                {picks: ['','','x','','','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','','','x','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','x','','',''], noteTimer: 8},
+                {picks: ['','','x','','',''], noteTimer: 8},
+            ],
+            [
+                {picks: ['','x','','','',''], chord: chordData.f7},
+                {picks: ['','','x','','','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','','','x','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','x','','','']}
+            ],
+            [
+                {picks: ['','x','','','',''], noteTimer: 8, chord: chordData.am},
+                {picks: ['','','x','','',''], noteTimer: 8},
+                {picks: ['','','x','','','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','','','x','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','x','','',''], noteTimer: 8},
+                {picks: ['','','S','','','s'], noteTimer: 8}
+            ]
+
+        ],
+    ],
+    music: {}
+};
+
 Template.gtbPage.helpers({
-    gtb: gtbData
+    gtb: gtbData2
 });
 
 Template.gtbPage.onRendered(function () {
 
-    var draw = SVG('gtb-content').size(1000, 200);
-    //draw.line(0, 100, 1000, 100).stroke({width: 1});
+    var gtbData = gtbData2;
 
-    draw.rect(1000, 1).move(0, 112);
-    draw.rect(1000, 1).move(0, 124);
-    draw.rect(1000, 1).move(0, 136);
-    draw.rect(1000, 1).move(0, 148);
-    draw.rect(1000, 1).move(0, 160);
-    draw.rect(1000, 1).move(0, 172);
+    var draw = SVG('gtb-content');
 
-    //var am=draw.chord(chord.am);
-   // var f7=draw.chord(chord.f7);
-    //draw.use(chord_f7).move(210, 100);
-    //draw.use(chord_f7).move(310, 100);
-    //draw.use(chord_f7).move(100, 0);
+    //乐谱绘制零点
+    var tabParam = {
+        x0: 0,
+        y0: 100,
+        spac: 140
+    };
 
-    //draw.use(draw.chord(am)).move(10, 100);
-    //draw.use(draw.chord(d_2)).move(110, 100);
+    var guitarNum = gtbData.guitarTabs.length;
 
-    //音符柄
-    var handled = draw.handled();
-    //x击弦图形
-    var pickedX = draw.pickedX();
-    //拍弦图形
-    var pickedSlap = draw.pickedSlap();
-    //数字图形
-    var pickedNums = [];
-    for (var i = 0, n = 24; i < n; i++) {
-        pickedNums.push(draw.pickedNum(i));
-    }
-    //向上扫弦图形
-    var pickedSweepUps = [];
-    for (var i = 0, n = 6; i < n; i++) {
-        pickedSweepUps.push(draw.pickedSweepUp(i));
-    }
-    //向下扫弦图形
-    var pickedSweepDowns = [];
-    for (var i = 0, n = 6; i < n; i++) {
-        pickedSweepDowns.push(draw.pickedSweepDown(i));
-    }
-    //向上琶音图形
-    var pickedRassUps = [];
-    for (var i = 0, n = 6; i < n; i++) {
-        pickedRassUps.push(draw.pickedRassUp(i));
-    }
-    //向下琶音图形
-    var pickedRassDowns = [];
-    for (var i = 0, n = 6; i < n; i++) {
-        pickedRassDowns.push(draw.pickedRassDown(i));
-    }
+    //定义乐谱页面宽度
+    var pageWidth = $('#gtb-content').width();
 
-    //遍历乐谱数据的弹奏数组
-    for (var i = 0, bl = gtbData.beats.length; i < bl; i++){
 
-        var beats = gtbData.beats;
+    //初始化击弦图形
+    draw.pickSymbols = draw.initPickSymbols();
 
-        //击弦数组
-        var picks = beats[i].syllable.picks;
+    //初始化和弦图形
+    draw.chordSymbols = draw.initChordSymbols();
 
-        //击弦图形在乐谱上的x坐标
-        var x = 100 + i * 20;
+    //初始化简谱音符
+    draw.notationSymbols = draw.initNotationSymbols();
+console.log(draw.notationSymbols);
+    draw.notationHead = draw.notationHead(guitarNum);
 
-        //柄绘制开关
-        var isHandle = false;
+    //乐谱头部宽度
+    var notationHeadWidth = draw.notationHeadWidth();
+    var notationHeadHeight = draw.notationHeadHeight(guitarNum);
 
-        //遍历击弦数组
-        for (var j = 0, pl = picks.length; j < pl; j++) {
-            //该击弦图形在乐谱上的y坐标
-            var y = 112 + j *12;
+    //定义每一行小节数
+    var numBarsInRow = 4;
 
-            //如果数据不存在，则返回原值，否则去除前后空格
-            var pick = typeof(picks[j]) === 'undefined' ? picks[j] : picks[j].trim();
+    //每一小节的宽度
+    var barWidth = (pageWidth - notationHeadWidth) / numBarsInRow;
+    //初始化小节线
+    draw.wireBarSymbol = draw.initWireBarSymbol(barWidth);
 
-            //如果pick值不存在，为空
-            if (typeof(pick) === 'undefined' || pick === ''){
-                //判断是否应该绘制柄，当已经绘制了击弦图形之后才绘制柄
-                if (isHandle) {
-                    //绘制柄
-                    draw.use(handled).move(x, y);
-                }
-            } else {
-                //如果pick值为'X'或'x'
-                if (pick.toUpperCase() === 'X') {
-                    //绘制x击弦图形
-                    draw.use(pickedX).move(x, y);
-                    //开启柄绘制开关
-                    isHandle = true;
-                    //跳出继续循环
-                    continue;
-                //如果pick值为数字
-                } else if (!isNaN(pick)) {
-                    //绘制数字图形
-                    draw.use(pickedNums[pick]).move(x, y);
-                    isHandle = true;
-                    continue;
-                //如果pick值为'P'或'p'
-                } else if (pick.toUpperCase() === 'P') {
-                    //绘制拍弦图形
-                    draw.use(pickedSlap).move(x, y);
-                    isHandle = true;
-                    //调到下一根弦才开始绘制柄，否则柄会与拍弦图形交叠
-                    j++;
-                    continue;
-                //在遍历picks数据时首先遇到的扫弦值是'S'，则说明是向上扫弦箭头
-                } else if (pick === 'S') {
-                    //保存当前弦位j为temp，从下一根弦开始继续遍历，寻找's'
-                    for (var k = j + 1, temp = j; k < pl; k++) {
-                        //如果还没找到's'，就跳到下一根弦开始绘制柄
-                        j++;
-                        //找到值's'，即箭头结束位置
-                        if (picks[k].trim() === 's') {
-                            //绘制向上扫弦箭头，跨k-temp根弦距
-                            draw.use(pickedSweepDowns[k - temp]).move(x, y);
-                            //开启柄绘制开关
-                            isHandle = true;
-                            //结束并跳出该循环
-                            break;
-                        }
+    //小节线谱绘图起点
+    var barOriginX = tabParam.x0 + notationHeadWidth;
 
-                    }
-                //在遍历picks数据时首先遇到的扫弦值是's'，则说明是向下扫弦箭头
-                } else if (pick === 's') {
-                    for (var k = j + 1, temp = j; k < pl; k++) {
-                        j++;
-                        if (picks[k].trim() === 'S') {
-                            draw.use(pickedSweepUps[k - temp]).move(x, y);
-                            isHandle = true;
-                            break;
-                        }
+    var barOriginY = tabParam.y0;
+    var beatPerBar = gtbData.beatPerBar;
+    var notePerBeat = gtbData.notePerBeat;
 
-                    }
-                //在遍历picks数据时首先遇到的扫弦值是'R'，则说明是向上琶音箭头
-                } else if (pick === 'R') {
-                    for (var k = j + 1, temp = j; k < pl; k++) {
-                        j++;
-                        if (picks[k].trim() === 'r') {
-                            draw.use(pickedRassDowns[k - temp]).move(x, y);
-                            isHandle = true;
-                            break;
-                        }
+    for (var i = 0, n = gtbData.guitarTabs.length; i < n; i++) {
 
-                    }
-                //在遍历picks数据时首先遇到的扫弦值是'r'，则说明是向下琶音箭头
-                } else if (pick === 'r') {
-                    for (var k = j + 1, temp = j; k < pl; k++) {
-                        j++;
-                        if (picks[k].trim() === 'R') {
-                            draw.use(pickedRassUps[k - temp]).move(x, y);
-                            isHandle = true;
-                            break;
-                        }
+        //乐谱小节数据
+        var bars = gtbData.guitarTabs[i];
 
-                    }
-                }
+        for (var j = 0, m = bars.length; j < m; j++) {
+
+            //绘制小节
+            draw.drawBar(draw, barOriginX, barOriginY, barWidth, bars[j], beatPerBar, notePerBeat);
+
+            //设定下个小节的绘图起点
+            //小节起点的X坐标右移小节宽度距离
+            barOriginX += barWidth;
+
+            //如果小节起点X坐标超出页面宽度，即一行绘制完成
+            if (barOriginX >= pageWidth || j === m - 1) {
+
+                //绘制乐谱头部
+                draw.use(draw.notationHead).move(tabParam.x0, barOriginY);
+
+                //X坐标归零
+                barOriginX = tabParam.x0 + notationHeadWidth;
+
+                //Y坐标下移高度
+                barOriginY = barOriginY +  notationHeadHeight + tabParam.spac;
 
             }
 
         }
-        var chord = beats[i].chord;
-        if (typeof(chord) === 'object') {
-            draw.use(draw.chord(chord)).move(x, 100);
-
-        }
-
     }
 
-    /*
-    draw.use(draw.picked(picks)).move(10, 136);
-    draw.use(draw.picked('x')).move(10, 148);
-    draw.use(draw.picked(0)).move(40, 136);
-    draw.use(draw.picked(0)).move(40, 148);
-    draw.use(draw.picked('p')).move(70, 136);
-    draw.use(draw.picked('S')).move(100, 112);
-    draw.use(draw.picked('s')).move(130, 112);
-    draw.use(draw.picked('R')).move(160, 112);
-    draw.use(draw.picked('r')).move(190, 112);
-    */
-    //console.log(draw.rounded(200, 100))
+    for (var i = -14; i <= -8; i++){
+        draw.use(draw.notation(i, 16)).move(20 * (i + 22), 220);
+    }
+    for (var i = -7; i <= -1; i++){
+        draw.use(draw.notation(i, 12)).move(20 * (i + 22), 220);
+    }
+    for (var i = 0; i <= 7; i++){
+        draw.use(draw.notation(i, 4)).move(20 * (i + 22), 220);
+    }
+    for (var i = 8; i <= 14; i++){
+        draw.use(draw.notation(i, 2)).move(20 * (i + 22), 220);
+    }
+    for (var i = 15; i <= 21; i++){
+        draw.use(draw.notation(i, 1)).move(20 * (i + 22), 220);
+    }
 
-    //console.log(d)
-
-    //var drawing = GTS('gtb-content');
-    //console.log(drawing)
-    //drawing.drawChord(am_f, 10, 149);
-
-
-/*
-    draw.use(new ChordSymbol(draw, d_2).draw().move(10, 149));
-    draw.use(new ChordSymbol(draw, am).draw().move(100, 149));
-    draw.use(new ChordSymbol(draw, g).draw().move(200, 149));
-    draw.use(new ChordSymbol(draw, f7).draw().move(300, 149));
-    draw.use(new ChordSymbol(draw, e).draw().move(400, 149));
-    draw.use(new ChordSymbol(draw, c).draw().move(500, 149));
-    draw.use(new ChordSymbol(draw, f).draw().move(600, 149));
-    draw.use(new ChordSymbol(draw, am_5).draw().move(700, 149));
-    draw.use(new ChordSymbol(draw, am_f).draw().move(800, 149));*/
-    //draw.use(new ChordSymbol(draw, g_3).drawChordSymbol().move(10, 249));
-    //draw.use(new ChordSymbol(draw, b).drawChordSymbol().move(100, 249));
-    //draw.use(GTSymbol.chordSymbol.draw(draw, g_3));
-    //draw.use(GTSymbol.chordSymbol.draw(draw, b).move(100, 249));
-    //console.log(new ChordSymbol(draw, am_f).drawing(10, 249));
-    //draw.use(GTSymbols.chordSymbol(draw, am_f).drawing(10, 249));
-    //console.log(GTSymbol.chordSymbol.draw(draw, g_3))
-    //drawSyllable();
-
-
+    draw.size(pageWidth, barOriginY);
 });
