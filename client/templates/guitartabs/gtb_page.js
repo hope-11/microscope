@@ -499,19 +499,27 @@ Template.gtbPage.onRendered(function () {
             //乐谱小节
             var bar = gtbData.bars[barSerial];
 
+            //小节每一把吉他的绘图起点坐标
+            var barX = rowX + notationHeadWidth + barWidth * i;
+            var barY = rowY;
+
             //按照该行最大吉他数量绘制小节
             for (var j = 0; j <= guitarSerial; j++) {
 
                 //小节内吉他谱的数据
                 var guitar = bar.guitars[j];
 
-                //小节每一把吉他的绘图起点坐标
-                var barX = rowX + notationHeadWidth + barWidth * i;
-                var barY = rowY + (guitarTabHeight + notationDistance) * j;
+                barY = rowY + (guitarTabHeight + notationDistance) * j;
 
                 //绘制小节
-                draw.drawBar(draw, barX, barY, barWidth, guitar, beatPerBar, notePerBeat);
+                draw.drawGuitarBar(draw, barX, barY, barWidth, guitar, beatPerBar, notePerBeat);
             }
+
+            var numNotation = bar.numNotation;
+
+            barY = barY + guitarTabHeight + notationDistance;
+
+            draw.drawNumberedBar(draw, barX, barY, barWidth, numNotation, beatPerBar, notePerBeat);
 
         }
 
@@ -520,6 +528,7 @@ Template.gtbPage.onRendered(function () {
 
     }
 
+    /*
     for (var i = -14; i <= -8; i++){
         draw.notation(i, 8).move(20 * (i + 22), 220);
     }
@@ -535,6 +544,7 @@ Template.gtbPage.onRendered(function () {
     for (var i = 15; i <= 21; i++){
         draw.notation(i, 1).move(20 * (i + 22), 220);
     }
+    */
 
     draw.size(pageWidth, rowY);
 });

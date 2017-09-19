@@ -157,7 +157,7 @@ SVG.GuitarTab = SVG.invent({
             return draw;
         },
 
-        bar: function(draw, x, y, width, barData, beatPerBar, notePerBeat) {
+        guitarBar: function(draw, x, y, width, barData, beatPerBar, notePerBeat) {
 
             //初始化击弦图形
             var pickSymbols = draw.pickSymbols;
@@ -297,6 +297,57 @@ SVG.GuitarTab = SVG.invent({
 
                 }
             }
+        },
+        numberedBar: function (draw, x, y, width, barData, beatPerBar, notePerBeat) {
+
+            var notationHeadSymbols = draw.notationHeadSymbols;
+            var numberedTabHeight = notationHeadSymbols[0].numberedTabHeight;
+
+            //最大时值
+            var maxTimer = 128;
+            //时值累加
+            var sumTimer = 0;
+            //上一次时值累加
+            var lastSumTimer = 0;
+            //该乐谱中每一拍的时值
+            var timerPerBeat = maxTimer / notePerBeat;
+
+            //该小节内音符的总数
+            var noteNum = barData.length;
+            //音符间距
+            var noteDistance = width / (noteNum + 1);
+            //音符连接，默认1拍
+            var noteJoin = 1;
+            //如果每小节大于等于6拍，并且是3的倍数，则3拍为一组连接
+            if (beatPerBar >= 6 && beatPerBar % 3 === 0){
+                noteJoin = 3;
+            }
+
+            var noteX = x + noteDistance - 1;
+            var noteY = y;
+
+            for (var i = 0; i < noteNum; i++) {
+                var note = barData[i];
+
+                var notation = typeof note.notation === 'undefined' ? 0 : note.notation;
+                var noteTimer = typeof note.noteTimer === 'undefined' ? 16 : note.noteTimer;
+
+                draw.notation(notation, noteTimer).move(noteX, noteY);
+
+                var words = note.words;
+                var wordY = noteY + numberedTabHeight * 1.6;
+                if (typeof words !== 'undefined') {
+                    for (var j = 0, n = words.length; j < n; j++) {
+                        draw.text(words[j]).font({size: 20, anchor: 'middle'}).move(noteX, wordY);
+                        wordY = wordY + numberedTabHeight;
+                    }
+                }
+
+                noteX = noteX + noteDistance;
+
+            }
+
+            draw.rect(1, numberedTabHeight).move(noteX, noteY);
         }
     },
     construct: {
@@ -317,8 +368,11 @@ SVG.GuitarTab = SVG.invent({
         initWireBarSymbol: function (width) {
             return this.put(new SVG.GuitarTab).wireBarSymbol(width);
         },
-        drawBar: function (draw, x, y, width, barData, beatPerBar, notePerBeat) {
-            return this.put(new SVG.GuitarTab).bar(draw, x, y, width, barData, beatPerBar, notePerBeat);
+        drawGuitarBar: function (draw, x, y, width, barData, beatPerBar, notePerBeat) {
+            return this.put(new SVG.GuitarTab).guitarBar(draw, x, y, width, barData, beatPerBar, notePerBeat);
+        },
+        drawNumberedBar: function (draw, x, y, width, barData, beatPerBar, notePerBeat) {
+            return this.put(new SVG.GuitarTab).numberedBar(draw, x, y, width, barData, beatPerBar, notePerBeat);
         }
     }
 });
@@ -1004,7 +1058,7 @@ SVG.Wire = SVG.invent({
          * @returns {number}
          */
         numberedNotationHeight: function () {
-            return this.wireDistance * 4;
+            return this.wireDistance * 2;
         },
 
         /**
@@ -1129,8 +1183,8 @@ SVG.NumberedMusicalNotation = SVG.invent({
          * 绘图起点
          */
         origin: {
-            x: 12,
-            y: 12
+            x: 0,
+            y: 0
         },
 
         /**
@@ -1209,7 +1263,7 @@ SVG.NumberedMusicalNotation = SVG.invent({
                 this.circle(r * 2).fill('#000').move(dotX - r, dotY);
             }
 
-            this.move (- origin.x, - origin.y);
+            //this.move(- origin.x, - origin.y);
 
             return this;
         }
