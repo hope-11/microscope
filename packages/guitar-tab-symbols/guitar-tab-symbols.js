@@ -56,12 +56,33 @@ SVG.GuitarTab = SVG.invent({
             return {}
         },
 
+        notationHeadSymbols: function () {
+
+            var maxGuitarNum = 3;
+
+            var symbols = [];
+
+            for (var i = 0; i < maxGuitarNum; i++) {
+
+                var symbol = this.notationHead(i + 1);
+
+                symbol.width = this.notationHeadWidth();
+                symbol.height = this.notationHeadHeight(i + 1);
+                symbol.notationDistance = this.notationHeadDistance();
+                symbol.guitarTabHeight = this.guitarTabHeight();
+                symbol.numberedTabHeight = this.numberedTabHeight();
+
+                symbols.push(symbol);
+            }
+
+            return symbols;
+        },
+        /*
         notationSymbols: function (startNoteTimer, endNoteTimer) {
 
             var notations = {};
 
-            //从浮点四分音符开始，到128分音符
-            var noteTimers = [48, 32, 24, 16, 12, 8, 6, 4 , 3, 2, 1.5, 1];
+            //从128分音符开始，到浮点四分音符
             var noteTimers = [1, 1.5, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48];
 
             var startTimer = typeof (startNoteTimer) === 'undefined' ? 8 : startNoteTimer;
@@ -74,7 +95,6 @@ SVG.GuitarTab = SVG.invent({
 
                 if(noteTimers[i] >=  startTimer && noteTimers[i] <= endTimer) {
 
-                    //var timers = notations['timer' + noteTimers[i]];
                     var timers = [];
 
                     for (var j = startNum, m = endNum; j <= m; j++){
@@ -87,6 +107,7 @@ SVG.GuitarTab = SVG.invent({
 
             return notations;
         },
+        */
 
         /**
          * 小节谱线
@@ -147,132 +168,134 @@ SVG.GuitarTab = SVG.invent({
 
             draw.use(wireBarSymbol).move(x, y);
 
-            //最大时值
-            var maxTimer = 128;
-            //时值累加
-            var sumTimer = 0;
-            //上一次时值累加
-            var lastSumTimer = 0;
-            //该乐谱中每一拍的时值
-            var timerPerBeat = maxTimer / notePerBeat;
+            if (typeof barData !== 'undefined' && barData.length > 0) {
+                //最大时值
+                var maxTimer = 128;
+                //时值累加
+                var sumTimer = 0;
+                //上一次时值累加
+                var lastSumTimer = 0;
+                //该乐谱中每一拍的时值
+                var timerPerBeat = maxTimer / notePerBeat;
 
-            //该小节内音符的总数
-            var noteNum = barData.length;
-            //音符间距
-            var noteDistance = width / (noteNum + 1);
-            //音符连接，默认1拍
-            var noteJoin = 1;
-            //如果每小节大于等于6拍，并且是3的倍数，则3拍为一组连接
-            if (beatPerBar >= 6 && beatPerBar % 3 === 0){
-                noteJoin = 3;
-            }
-
-            //遍历乐谱数据的弹奏数组
-            for (var i = 0; i < noteNum; i++) {
-
-                //击弦数组
-                var picks = barData[i].picks;
-
-                //和弦对象
-                var chord = barData[i].chord;
-
-                //击弦图形在乐谱上的x坐标
-                var pickX = x + noteDistance * (i + 1);
-
-                //绘制击弦图形
-                draw.usePick(draw, picks, pickSymbols, pickX, y);
-
-                //var currentNote, lastNote, nextNote;
-                var currentNoteTimer, lastNoteTimer, nextNoteTimer;
-
-                //音符为几分音符，如果该音符中未定义，则默认为8分音符，时值为16
-                //currentNote = typeof(barData[i].note) === 'undefined' ? 8 : barData[i].note;
-                //当前音符时值
-                //currentNoteTimer = maxTimer / currentNote;
-                currentNoteTimer = typeof(barData[i].noteTimer) === 'undefined' ? 16 : barData[i].noteTimer;
-                if (i > 0) {
-                    lastNoteTimer = typeof(barData[i - 1].noteTimer) === 'undefined' ? 16 : barData[i - 1].noteTimer;
-                }
-                if (i < noteNum - 1) {
-                    nextNoteTimer = typeof(barData[i + 1].noteTimer) === 'undefined' ? 16 : barData[i + 1].noteTimer;
+                //该小节内音符的总数
+                var noteNum = barData.length;
+                //音符间距
+                var noteDistance = width / (noteNum + 1);
+                //音符连接，默认1拍
+                var noteJoin = 1;
+                //如果每小节大于等于6拍，并且是3的倍数，则3拍为一组连接
+                if (beatPerBar >= 6 && beatPerBar % 3 === 0){
+                    noteJoin = 3;
                 }
 
-                //连接线绘图在画板上的纵坐标
-                var joinLineY = y + 66;
+                //遍历乐谱数据的弹奏数组
+                for (var i = 0; i < noteNum; i++) {
 
-                //绘制连接竖线
-                this.joinLineVertical(draw, pickX, joinLineY);
+                    //击弦数组
+                    var picks = barData[i].picks;
 
-                //小于8分音符的，才绘制连接横线
-                if (currentNoteTimer <= 16) {
-                    //时值累加
-                    sumTimer = sumTimer + currentNoteTimer;
+                    //和弦对象
+                    var chord = barData[i].chord;
 
-                    if (lastSumTimer === 0){
-                        //如果上一次计算的时值之和为0，说明该音符是该小组的第一个音符，所以在右边画线
-                        this.joinLineHorizontal(draw, pickX, joinLineY, noteDistance / 2, currentNoteTimer);
+                    //击弦图形在乐谱上的x坐标
+                    var pickX = x + noteDistance * (i + 1);
 
-                        //把当前时值之和赋值给上一次，以便下个音符做判断
-                        lastSumTimer = sumTimer;
-                    } else if (sumTimer === timerPerBeat * noteJoin) {
-                        //如果当前时值之和 等于 每一拍的时值*应连接的拍数（即应连接的时值之和），在左边画线
-                        this.joinLineHorizontal(draw, pickX, joinLineY, -noteDistance / 2, currentNoteTimer);
+                    //绘制击弦图形
+                    draw.usePick(draw, picks, pickSymbols, pickX, y);
 
-                        //该小组结束，时值之和归0
-                        sumTimer = 0;
-                        lastSumTimer = 0;
-                    } else if (sumTimer > timerPerBeat * noteJoin) {
-                        //如果当前时值之和 等于 每一拍的时值*应连接的拍数（即应连接的时值之和），则报告问题
-                        console.log('error timer');
+                    //var currentNote, lastNote, nextNote;
+                    var currentNoteTimer, lastNoteTimer, nextNoteTimer;
 
-                        //该小组结束，时值之和归0
-                        sumTimer = 0;
-                        lastSumTimer = 0;
-
-                    } else {
-
-                        //在小组起始和结束之间的音符
-                        if (currentNoteTimer === lastNoteTimer && currentNoteTimer < nextNoteTimer) {
-
-                            //如果 当前音符时值 等于 前面音符时值，并且 小于 后面音符时值
-                            //左边按照 当前音符 绘线
-                            this.joinLineHorizontal(draw, pickX, joinLineY, - noteDistance / 2, currentNoteTimer);
-                            //右边按照 后面音符 绘线
-                            this.joinLineHorizontal(draw, pickX, joinLineY, noteDistance / 2, nextNoteTimer);
-
-                        } else if (currentNoteTimer >= lastNoteTimer && currentNoteTimer >= nextNoteTimer) {
-
-                            //如果 当前音符时值 大于等于 前面音符时值 和 后面音符时值
-                            //左右都按照 当前音符 绘线
-                            this.joinLineHorizontal(draw, pickX, joinLineY, - noteDistance / 2, currentNoteTimer);
-                            this.joinLineHorizontal(draw, pickX, joinLineY, noteDistance / 2, currentNoteTimer);
-
-                        } else if (currentNoteTimer < lastNoteTimer && currentNoteTimer < nextNoteTimer) {
-
-                            //如果 当前音符时值 小于 前面音符时值 和 后面音符时值
-                            //左边按照 前面音符 绘线
-                            this.joinLineHorizontal(draw, pickX, joinLineY, - noteDistance / 2, lastNoteTimer);
-                            //右边按照 当前音符 绘线
-                            this.joinLineHorizontal(draw, pickX, joinLineY, noteDistance / 2, currentNoteTimer);
-
-                        } else if (currentNoteTimer < lastNoteTimer && currentNoteTimer === nextNoteTimer) {
-
-
-                            //如果 当前音符时值 小于 前面音符时值，并且 等于 后面音符时值
-                            //左边按照 前面音符 绘线
-                            this.joinLineHorizontal(draw, pickX, joinLineY, - noteDistance / 2, lastNoteTimer);
-                            //右边按照 当前音符 绘线
-                            this.joinLineHorizontal(draw, pickX, joinLineY, noteDistance / 2, currentNoteTimer);
-                        }
+                    //音符为几分音符，如果该音符中未定义，则默认为8分音符，时值为16
+                    //currentNote = typeof(barData[i].note) === 'undefined' ? 8 : barData[i].note;
+                    //当前音符时值
+                    //currentNoteTimer = maxTimer / currentNote;
+                    currentNoteTimer = typeof(barData[i].noteTimer) === 'undefined' ? 16 : barData[i].noteTimer;
+                    if (i > 0) {
+                        lastNoteTimer = typeof(barData[i - 1].noteTimer) === 'undefined' ? 16 : barData[i - 1].noteTimer;
                     }
-                } else {
-                    sumTimer = 0;
-                    lastSumTimer = 0;
+                    if (i < noteNum - 1) {
+                        nextNoteTimer = typeof(barData[i + 1].noteTimer) === 'undefined' ? 16 : barData[i + 1].noteTimer;
+                    }
+
+                    //连接线绘图在画板上的纵坐标
+                    var joinLineY = y + 66;
+
+                    //绘制连接竖线
+                    this.joinLineVertical(draw, pickX, joinLineY);
+
+                    //小于8分音符的，才绘制连接横线
+                    if (currentNoteTimer <= 16) {
+                        //时值累加
+                        sumTimer = sumTimer + currentNoteTimer;
+
+                        if (lastSumTimer === 0){
+                            //如果上一次计算的时值之和为0，说明该音符是该小组的第一个音符，所以在右边画线
+                            this.joinLineHorizontal(draw, pickX, joinLineY, noteDistance / 2, currentNoteTimer);
+
+                            //把当前时值之和赋值给上一次，以便下个音符做判断
+                            lastSumTimer = sumTimer;
+                        } else if (sumTimer === timerPerBeat * noteJoin) {
+                            //如果当前时值之和 等于 每一拍的时值*应连接的拍数（即应连接的时值之和），在左边画线
+                            this.joinLineHorizontal(draw, pickX, joinLineY, -noteDistance / 2, currentNoteTimer);
+
+                            //该小组结束，时值之和归0
+                            sumTimer = 0;
+                            lastSumTimer = 0;
+                        } else if (sumTimer > timerPerBeat * noteJoin) {
+                            //如果当前时值之和 等于 每一拍的时值*应连接的拍数（即应连接的时值之和），则报告问题
+                            console.log('error timer');
+
+                            //该小组结束，时值之和归0
+                            sumTimer = 0;
+                            lastSumTimer = 0;
+
+                        } else {
+
+                            //在小组起始和结束之间的音符
+                            if (currentNoteTimer === lastNoteTimer && currentNoteTimer < nextNoteTimer) {
+
+                                //如果 当前音符时值 等于 前面音符时值，并且 小于 后面音符时值
+                                //左边按照 当前音符 绘线
+                                this.joinLineHorizontal(draw, pickX, joinLineY, - noteDistance / 2, currentNoteTimer);
+                                //右边按照 后面音符 绘线
+                                this.joinLineHorizontal(draw, pickX, joinLineY, noteDistance / 2, nextNoteTimer);
+
+                            } else if (currentNoteTimer >= lastNoteTimer && currentNoteTimer >= nextNoteTimer) {
+
+                                //如果 当前音符时值 大于等于 前面音符时值 和 后面音符时值
+                                //左右都按照 当前音符 绘线
+                                this.joinLineHorizontal(draw, pickX, joinLineY, - noteDistance / 2, currentNoteTimer);
+                                this.joinLineHorizontal(draw, pickX, joinLineY, noteDistance / 2, currentNoteTimer);
+
+                            } else if (currentNoteTimer < lastNoteTimer && currentNoteTimer < nextNoteTimer) {
+
+                                //如果 当前音符时值 小于 前面音符时值 和 后面音符时值
+                                //左边按照 前面音符 绘线
+                                this.joinLineHorizontal(draw, pickX, joinLineY, - noteDistance / 2, lastNoteTimer);
+                                //右边按照 当前音符 绘线
+                                this.joinLineHorizontal(draw, pickX, joinLineY, noteDistance / 2, currentNoteTimer);
+
+                            } else if (currentNoteTimer < lastNoteTimer && currentNoteTimer === nextNoteTimer) {
+
+
+                                //如果 当前音符时值 小于 前面音符时值，并且 等于 后面音符时值
+                                //左边按照 前面音符 绘线
+                                this.joinLineHorizontal(draw, pickX, joinLineY, - noteDistance / 2, lastNoteTimer);
+                                //右边按照 当前音符 绘线
+                                this.joinLineHorizontal(draw, pickX, joinLineY, noteDistance / 2, currentNoteTimer);
+                            }
+                        }
+                    } else {
+                        sumTimer = 0;
+                        lastSumTimer = 0;
+                    }
+
+                    //绘制和弦
+                    draw.useChord(draw, chord, chordSymbols, pickX, y - 12);
+
                 }
-
-                //绘制和弦
-                draw.useChord(draw, chord, chordSymbols, pickX, y - 12);
-
             }
         }
     },
@@ -283,8 +306,13 @@ SVG.GuitarTab = SVG.invent({
         initChordSymbols: function () {
             return this.put(new SVG.GuitarTab).chordSymbols();
         },
+        /*
         initNotationSymbols: function (startNoteTimer, endNoteTimer) {
             return this.put(new SVG.GuitarTab).notationSymbols(startNoteTimer, endNoteTimer);
+        },
+        */
+        initNotationHeadSymbols: function () {
+            return this.put(new SVG.GuitarTab).notationHeadSymbols();
         },
         initWireBarSymbol: function (width) {
             return this.put(new SVG.GuitarTab).wireBarSymbol(width);
@@ -968,7 +996,7 @@ SVG.Wire = SVG.invent({
          * @returns {number}
          */
         notationDistance: function () {
-            return this.wireDistance * 4;
+            return this.wireDistance * 6;
         },
 
         /**
@@ -1046,9 +1074,10 @@ SVG.Wire = SVG.invent({
                 }
 
                 //字符TAB
-                this.text('T').font(this.textFont).move(x0 + 18, y0);
-                this.text('A').font(this.textFont).move(x0 + 18, y0 + 20);
-                this.text('B').font(this.textFont).move(x0 + 18, y0 + 40);
+                var tabText = 'TAB';
+                for (var j = 0, m = tabText.length; j < m; j++) {
+                    this.text(tabText.charAt(j)).font(this.textFont).move(x0 + 18, y0 - 8 + 20 * j);
+                }
             }
 
             this.move(- bracketTopPathOrigin.x, - headLineOrigin.y);
@@ -1072,6 +1101,15 @@ SVG.Wire = SVG.invent({
         notationHeadHeight: function (guitarNum) {
             return this.put(new SVG.Wire).headHeight(guitarNum);
         },
+        notationHeadDistance: function () {
+            return this.put(new SVG.Wire).notationDistance();
+        },
+        guitarTabHeight: function () {
+            return this.put(new SVG.Wire).guitarNotationHeight();
+        },
+        numberedTabHeight: function () {
+            return this.put(new SVG.Wire).numberedNotationHeight();
+        },
         notationHead: function (guitarNum) {
             return this.put(new SVG.Wire).head(guitarNum);
         },
@@ -1083,8 +1121,8 @@ SVG.Wire = SVG.invent({
 });
 
 SVG.NumberedMusicalNotation = SVG.invent({
-    create: 'symbol',
-    inherit: SVG.Container,
+    create: 'g',
+    inherit: SVG.G,
     extend: {
 
         /**
