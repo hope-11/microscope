@@ -2,7 +2,11 @@
 "use strict";
 
 SVG = require('svg.js');
+var parameters = require('./parameters.js');
 
+var guitarTab = parameters.guitarTab;
+
+SVG.guitarTab = guitarTab;
 SVG.GuitarTab = SVG.invent({
     create: 'doc',
     inherit: SVG.Container,
@@ -66,11 +70,11 @@ SVG.GuitarTab = SVG.invent({
 
                 var symbol = this.notationHead(i + 1);
 
-                symbol.width = this.notationHeadWidth();
-                symbol.height = this.notationHeadHeight(i + 1);
-                symbol.notationDistance = this.notationHeadDistance();
-                symbol.guitarTabHeight = this.guitarTabHeight();
-                symbol.numberedTabHeight = this.numberedTabHeight();
+                //symbol.width = this.notationHeadWidth();
+                symbol.height = guitarTab.headHeight(i + 1);
+                //symbol.notationDistance = this.notationHeadDistance();
+                //symbol.guitarTabHeight = this.guitarTabHeight();
+                //symbol.numberedTabHeight = this.numberedTabHeight();
 
                 symbols.push(symbol);
             }
@@ -204,13 +208,8 @@ SVG.GuitarTab = SVG.invent({
                     //绘制击弦图形
                     draw.usePick(draw, picks, pickSymbols, pickX, y);
 
-                    //var currentNote, lastNote, nextNote;
                     var currentNoteTimer, lastNoteTimer, nextNoteTimer;
 
-                    //音符为几分音符，如果该音符中未定义，则默认为8分音符，时值为16
-                    //currentNote = typeof(barData[i].note) === 'undefined' ? 8 : barData[i].note;
-                    //当前音符时值
-                    //currentNoteTimer = maxTimer / currentNote;
                     currentNoteTimer = typeof(barData[i].noteTimer) === 'undefined' ? 16 : barData[i].noteTimer;
                     if (i > 0) {
                         lastNoteTimer = typeof(barData[i - 1].noteTimer) === 'undefined' ? 16 : barData[i - 1].noteTimer;
@@ -279,7 +278,6 @@ SVG.GuitarTab = SVG.invent({
 
                             } else if (currentNoteTimer < lastNoteTimer && currentNoteTimer === nextNoteTimer) {
 
-
                                 //如果 当前音符时值 小于 前面音符时值，并且 等于 后面音符时值
                                 //左边按照 前面音符 绘线
                                 this.joinLineHorizontal(draw, pickX, joinLineY, - noteDistance / 2, lastNoteTimer);
@@ -301,7 +299,7 @@ SVG.GuitarTab = SVG.invent({
         numberedBar: function (draw, x, y, width, barData, beatPerBar, notePerBeat) {
 
             var notationHeadSymbols = draw.notationHeadSymbols;
-            var numberedTabHeight = notationHeadSymbols[0].numberedTabHeight;
+            var numberedTabHeight = guitarTab.numberedNotationHeight();
 
             //最大时值
             var maxTimer = 128;
@@ -329,24 +327,92 @@ SVG.GuitarTab = SVG.invent({
             for (var i = 0; i < noteNum; i++) {
                 var note = barData[i];
 
+                //音符
                 var notation = typeof note.notation === 'undefined' ? 0 : note.notation;
+                //音符时值
                 var noteTimer = typeof note.noteTimer === 'undefined' ? 16 : note.noteTimer;
 
-                draw.notation(notation, noteTimer).move(noteX, noteY);
+                //绘制音符
+                var noteSymbol = draw.notation(notation, noteTimer).move(noteX, noteY);
 
+                //音符底部横线的位置、距离、长度
+                var noteLineY = noteSymbol.lineY;
+                var noteLineDistance = noteSymbol.lineDistance;
+                var noteLineLength = noteSymbol.lineLength;
+
+                //累加时值
+                sumTimer = sumTimer + noteTimer;
+
+                //如果上一次累加时值为0，则说明是该小组第一个音符，不画连线
+                if (lastSumTimer === 0) {
+                    //如果当前累加时值等于每小组的时值和，则该小组结束
+                    if (sumTimer >= timerPerBeat * noteJoin) {
+                        //累加时值归零
+                        sumTimer = 0;
+                    }
+                    //当前累加时值保存到上一次累加时值，以供下一次判断使用
+                    lastSumTimer = sumTimer;
+                } else {
+                    //如果当前累加时值大于每小组的时值和，抛出错误、归零，结束小节
+                    if (sumTimer > timerPerBeat * noteJoin) {
+                        //报错
+                        console.log('error timer');
+
+                        //归零
+                        sumTimer = 0;
+                        lastSumTimer = 0;
+                    } else {
+                        //否则如果当前累加时值小于等于每小组的时值和
+                        //上一个音符
+                        var lastNote = barData[i - 1];
+                        //上一个音符时值
+                        var lastNoteTimer = typeof lastNote.noteTimer === 'undefined' ? 16 : note.noteTimer;
+                        //当前音符应该画几条线
+                        var lineNum = Math.log(Math.floor(16 / noteTimer)) / Math.log(2) + 1;
+
+                        //如果当前音符时值小于上一个音符时值，那么按照上一个音符的线数
+                        if (noteTimer < lastNoteTimer) {
+                            lineNum = Math.log(Math.floor(16 / lastNoteTimer)) / Math.log(2) + 1;
+                        }
+
+                        for (var j = 0; j < lineNum; j ++) {
+                            //绘制底部横线
+                            draw.line(0, noteLineY, noteDistance - noteLineLength, noteLineY).stroke({width: 1})
+                                .move(noteX - noteDistance + noteLineLength / 2, noteY + noteLineY + noteLineDistance * j);
+                        }
+
+                        //如果当前累加时值小于每小组时值和
+                        if (sumTimer < timerPerBeat * noteJoin) {
+                            //当前累加时值保存到上一次累加时值，以供下一次判断使用
+                            lastSumTimer = sumTimer;
+                        } else {
+                            //否则如果当前累加时值等于每小组时值和，该小组结束，当前累加时值及上一次累加时值归零
+                            sumTimer = 0;
+                            lastSumTimer = 0;
+                        }
+                    }
+                }
+
+
+                //歌词
                 var words = note.words;
+                //歌词Y坐标
                 var wordY = noteY + numberedTabHeight * 1.6;
                 if (typeof words !== 'undefined') {
                     for (var j = 0, n = words.length; j < n; j++) {
+                        //绘制歌词
                         draw.text(words[j]).font({size: 20, anchor: 'middle'}).move(noteX, wordY);
+                        //歌词Y坐标下移
                         wordY = wordY + numberedTabHeight;
                     }
                 }
 
+                //音符X坐标右移
                 noteX = noteX + noteDistance;
 
             }
 
+            //小节结束线
             draw.rect(1, numberedTabHeight).move(noteX, noteY);
         }
     },
@@ -383,142 +449,25 @@ SVG.Chord = SVG.invent({
     extend: {
 
         /**
-         * 绘图线宽
-         */
-        lineWidth: 1,
-
-        /**
-         * 弦间距
-         */
-        wireDistance: 9,
-
-        /**
-         * 品柱间距
-         */
-        fredDistance: 16,
-
-        /**
-         * 指位编号的背景圆形半径
-         */
-        fingerCircleRadius: 6,
-
-        /**
-         * 弦数量
-         */
-        wireNumber: 6,
-
-        /**
-         * 手指符号文字
-         */
-        fingerTextFont: {
-            size: 12,                   //文字尺寸
-            weight: 'bold',             //粗体
-            anchor: 'middle'            //居中
-        },
-
-        /**
-         * 和弦名称文字
-         */
-        nameTextFont: {
-            size: 16,                   //文字尺寸
-            anchor: 'middle'            //居中
-        },
-
-        /**
-         * 计算应绘制的品位数
-         * @returns {number}
-         * @private
-         */
-        fredNumber: function (chord) {
-            //默认3个品格
-            var num = 3;
-            //遍历和弦指位元素，有品位超过3的，则取代
-            chord.fingers.forEach(function(finger){
-                var fred = finger.fred;
-                if (fred > num){
-                    num = fred;
-                }
-            });
-            return num;
-        },
-
-        /**
-         * 获取网格宽度
-         * @returns {number}
-         * @private
-         */
-        gridWidth: function () {
-            return this.wireDistance * (this.wireNumber - 1) + this.lineWidth;
-        },
-
-        /**
-         * 获取网格高度
-         * @returns {number}
-         * @private
-         */
-        gridHeight: function (chord) {
-            return this.fredDistance * this.fredNumber(chord);
-        },
-
-
-        /**
-         * 获取和弦名称文字位置
-         * @returns {{x: number, y: number}}
-         * @private
-         */
-        nameTextPosition: function () {
-            var x = this.gridOrigin().x + this.gridWidth() / 2;
-            var y = 0;
-            return {x: x, y: y};
-        },
-
-        /**
-         * 设置网格绘制的坐标原点
-         * @returns {{x: number, y: number}}
-         * @private
-         */
-        gridOrigin: function () {
-            var x = this.nameTextFont.size;
-            var y = this.nameTextFont.size;
-            return {x: x, y: y};
-        },
-
-        /**
-         * 计算指位圆心坐标
-         * @param fred
-         * @param pick
-         * @returns {{x: number, y: number}}
-         * @private
-         */
-        fingerCirclePosition: function (fred, pick) {
-            //指位编号所在弦的位置坐标，即X轴坐标，（弦总数 - 弦号） * 弦距 - 指圆半径
-            var x = this.gridOrigin().x + (this.wireNumber - pick) * this.wireDistance - this.fingerCircleRadius;
-            //指位编号所在品格的位置坐标，即Y轴坐标，（品位号 * 品距） - 半个品距 - 指圆半径
-            var y = this.gridOrigin().y + fred * this.fredDistance - this.fredDistance / 2 - this.fingerCircleRadius;
-            return {x: x, y: y};
-
-        },
-
-        /**
          * 绘制和弦
          * @param chord
          * @returns {*}
          */
         drawing: function (chord) {
-            var lineWidth = this.lineWidth;
+            var wireWidth = guitarTab.wireWidth;
 
-            var wireDistance = this.wireDistance;
-            var fredDistance = this.fredDistance;
-            var fingerCircleRadius = this.fingerCircleRadius;
-            var wireNumber = this.wireNumber;
-            var fingerTextFont = this.fingerTextFont;
-            var nameTextFont = this.nameTextFont;
+            var wireDistance = guitarTab.chordWireDistance;
+            var fredDistance = guitarTab.chordFredDistance;
+            var fingerCircleRadius = guitarTab.chordFingerCircleRadius;
+            var wireNumber = guitarTab.wireNumber;
+            var fingerTextFont = guitarTab.chordFingerTextFont;
+            var nameTextFont = guitarTab.chordNameTextFont;
 
-            var gridWidth = this.gridWidth();
-            var gridHeight = this.gridHeight(chord);
-            var fredNumber = this.fredNumber(chord);
-            var nameTextPosition = this.nameTextPosition();
-            var gridOrigin = this.gridOrigin();
+            var gridWidth = guitarTab.chordGridWidth();
+            var gridHeight = guitarTab.chordGridHeight(chord);
+            var fredNumber = guitarTab.chordFredNumber(chord);
+            var nameTextPosition = guitarTab.chordNameTextPosition();
+            var gridOrigin = guitarTab.origin;
 
             //绘制和弦名称
             this.text(chord.name)
@@ -527,14 +476,14 @@ SVG.Chord = SVG.invent({
 
             //绘制弦
             for (var i = 0, n = wireNumber; i < n; i++) {
-                this.rect(lineWidth, gridHeight)
+                this.rect(wireWidth, gridHeight)
                     .move(gridOrigin.x + wireDistance * i, gridOrigin.y);
             }
 
             //绘制品柱
             for (var i = 0, n = fredNumber; i < n + 1; i++) {
 
-                this.rect(gridWidth, lineWidth)
+                this.rect(gridWidth, wireWidth)
                     .move(gridOrigin.x, gridOrigin.y + fredDistance * i);
             }
 
@@ -546,7 +495,7 @@ SVG.Chord = SVG.invent({
                 //判断手指是否为空对象，如果是空对象，不执行
                 if (!$.isEmptyObject(finger)) {
                     //指位坐标
-                    var fingerCirclePosition = this.fingerCirclePosition(finger.fred, finger.pick[0]);
+                    var fingerCirclePosition = guitarTab.chordFingerCirclePosition(finger.fred, finger.pick[0]);
 
                     //只有起始品位存在并且不为1时才标记，起始品位，否则不需标记
                     if (chord.startFred && chord.startFred !== 1) {
@@ -562,7 +511,7 @@ SVG.Chord = SVG.invent({
                         //横按起始弦位
                         var xFingerStart = fingerCirclePosition.x + fingerCircleRadius * 5 / 4;
                         //横按结束弦位，一般为1弦
-                        var xFingerEnd = this.fingerCirclePosition(finger.fred, finger.pick[1]).x + fingerCircleRadius;
+                        var xFingerEnd = guitarTab.chordFingerCirclePosition(finger.fred, finger.pick[1]).x + fingerCircleRadius;
 
                         var yFinger = fingerCirclePosition.y + fingerCircleRadius;
                         //绘制横按图形，两端为圆的线，宽度为指圆半径的1/2
@@ -616,40 +565,6 @@ SVG.Picked = SVG.invent({
     create: 'symbol',
     inherit: SVG.Container,
     extend: {
-
-        /**
-         * 图形高度
-         */
-        height: 12,
-
-        /**
-         * 设定绘图原点
-         * @returns {{x: number, y: number}}
-         */
-        origin: function () {
-            return {
-                x: this.height / 2,
-                y: this.height / 2
-            }
-        },
-
-        /**
-         * 线样式
-         */
-        lineStroke: {
-            width: 1
-        },
-
-        /**
-         * 数字样式
-         */
-        numFont: {
-            size: 15,
-            anchor: 'middle'
-        },
-
-
-
         /**
          * 绘制x样式的击弦图形
          * @param x
@@ -657,12 +572,13 @@ SVG.Picked = SVG.invent({
          * @returns {SVG.Picked}
          */
         pickX: function () {
-            var origin = this.origin();
-            var height = this.height * 0.8;
+            var origin = guitarTab.origin;
+            var height = guitarTab.pickHeight * 0.8;
+            var lineStroke = guitarTab.lineStroke;
 
             //绘制两条交叉线
-            this.line(origin.x, origin.y, origin.x + height, origin.y + height).stroke(this.lineStroke);
-            this.line(origin.x, origin.y + height, origin.x + height, origin.y).stroke(this.lineStroke);
+            this.line(origin.x, origin.y, origin.x + height, origin.y + height).stroke(lineStroke);
+            this.line(origin.x, origin.y + height, origin.x + height, origin.y).stroke(lineStroke);
 
             //将两条线的交叉点作为图形原点
             this.move( - height / 2 - origin.x,  - height / 2 - origin.y + 0.5);
@@ -676,14 +592,8 @@ SVG.Picked = SVG.invent({
          * @returns {SVG.Picked}
          */
         pickNum: function (num) {
-            var origin = this.origin();
-            var numFont = this.numFont;
-
-            /*
-            this.rect(10, 1)
-                .fill('#fff')
-                .move(x - 5, y);
-            */
+            var origin = guitarTab.origin;
+            var numFont = guitarTab.pickNumFont;
 
             //绘制文字，并将文字上移半个字高
             this.text(num + '')
@@ -702,12 +612,13 @@ SVG.Picked = SVG.invent({
          * @returns {SVG.Picked}
          */
         pickSlap: function () {
-            var origin = this.origin();
+            var origin = guitarTab.origin;
 
             //外圈宽度
-            var width = this.height * 0.8;
+            var width = guitarTab.pickHeight * 0.8;
             //外圈高度
-            var height = this.height * 2 * 0.8;
+            var height = guitarTab.pickHeight * 2 * 0.8;
+            var lineStroke = guitarTab.lineStroke;
             //外圈举行圆角半径
             var r = width / 2;
 
@@ -719,8 +630,8 @@ SVG.Picked = SVG.invent({
                 .move(origin.x, origin.y);
 
             //绘制圈内交叉线
-            this.line(origin.x, origin.y + r, origin.x + width, origin.y + height - r).stroke(this.lineStroke);
-            this.line(origin.x, origin.y + height - r, origin.x + width, origin.y + r).stroke(this.lineStroke);
+            this.line(origin.x, origin.y + r, origin.x + width, origin.y + height - r).stroke(lineStroke);
+            this.line(origin.x, origin.y + height - r, origin.x + width, origin.y + r).stroke(lineStroke);
 
             //将两条线的交叉点作为图形原点
             this.move( - width / 2 - origin.x,  - height / 2 - origin.y + 0.5);
@@ -735,8 +646,10 @@ SVG.Picked = SVG.invent({
          * @returns {SVG.Picked}
          */
         sweepStyle: function (origin, lineLength) {
+
+            var lineStroke = guitarTab.lineStroke;
             //绘制一条直线
-            this.line(origin.x, origin.y, origin.x, origin.y + lineLength).stroke(this.lineStroke);
+            this.line(origin.x, origin.y, origin.x, origin.y + lineLength).stroke(lineStroke);
 
             return this;
         },
@@ -749,9 +662,10 @@ SVG.Picked = SVG.invent({
          */
         rassStyle: function (origin, lineLength) {
             //曲线单边宽度
-            var rassWidth = this.height / 6;
+            var rassWidth = guitarTab.pickHeight / 6;
             //曲线每小节高度
-            var rassHeight = this.height / 6;
+            var rassHeight = guitarTab.pickHeight / 6;
+            var lineStroke = guitarTab.lineStroke;
 
             //定义曲线路径数组
             var pathArray = [];
@@ -767,7 +681,7 @@ SVG.Picked = SVG.invent({
             //绘制此二次贝塞尔曲线
             this.path(pathArray)
                 .fill('none')
-                .stroke(this.lineStroke);
+                .stroke(lineStroke);
 
             return this;
         },
@@ -781,18 +695,19 @@ SVG.Picked = SVG.invent({
          */
         arrowStyle: function (origin, lineLength ,up) {
             //箭头单边宽度
-            var arrowWidth = this.height / 4;
+            var arrowWidth = guitarTab.pickHeight / 4;
             //箭头高度
-            var arrowHeight = this.height / 2;
+            var arrowHeight = guitarTab.pickHeight / 2;
+            var lineStroke = guitarTab.lineStroke;
 
             if (up) {
                 //绘制向上箭头
-                this.line(origin.x, origin.y, origin.x - arrowWidth, origin.y + arrowHeight).stroke(this.lineStroke);
-                this.line(origin.x, origin.y, origin.x + arrowWidth, origin.y + arrowHeight).stroke(this.lineStroke);
+                this.line(origin.x, origin.y, origin.x - arrowWidth, origin.y + arrowHeight).stroke(lineStroke);
+                this.line(origin.x, origin.y, origin.x + arrowWidth, origin.y + arrowHeight).stroke(lineStroke);
             } else {
                 //绘制向下箭头
-                this.line(origin.x, origin.y + lineLength, origin.x - arrowWidth, origin.y + lineLength - arrowHeight).stroke(this.lineStroke);
-                this.line(origin.x, origin.y + lineLength, origin.x + arrowWidth, origin.y + lineLength - arrowHeight).stroke(this.lineStroke);
+                this.line(origin.x, origin.y + lineLength, origin.x - arrowWidth, origin.y + lineLength - arrowHeight).stroke(lineStroke);
+                this.line(origin.x, origin.y + lineLength, origin.x + arrowWidth, origin.y + lineLength - arrowHeight).stroke(lineStroke);
             }
 
             return this;
@@ -807,9 +722,9 @@ SVG.Picked = SVG.invent({
          */
         pickSweep: function (sweep, step, up) {
             //绘图起点
-            var origin = this.origin();
+            var origin = guitarTab.origin;
             //线长
-            var lineLength = this.height * step;
+            var lineLength = guitarTab.pickHeight * step;
 
             switch (sweep) {
                 case 'rass':
@@ -835,11 +750,12 @@ SVG.Picked = SVG.invent({
          * @returns {SVG.Picked}
          */
         handle: function () {
-            var origin = this.origin();
+            var origin = guitarTab.origin;
 
-            var lineHeight = this.height;
+            var lineHeight = guitarTab.pickHeight;
+            var lineStroke = guitarTab.lineStroke;
 
-            this.line(origin.x, origin.y, origin.x, origin.y + lineHeight).stroke(this.lineStroke);
+            this.line(origin.x, origin.y, origin.x, origin.y + lineHeight).stroke(lineStroke);
 
             this.move(- origin.x, - origin.y - lineHeight / 2);
 
@@ -857,6 +773,8 @@ SVG.Picked = SVG.invent({
          */
         drawPicks: function (draw, picks, pickSymbols, x0, y0) {
 
+            var height = guitarTab.pickHeight;
+
             var x = x0;
 
             //符杆绘制开关
@@ -865,7 +783,7 @@ SVG.Picked = SVG.invent({
             //遍历击弦数组
             for (var j = 0, pl = picks.length; j < pl; j++) {
                 //该击弦图形在乐谱上的y坐标
-                var y = y0 + (pl - j - 1) * this.height;
+                var y = y0 + (pl - j - 1) * height;
 
                 //如果数据不存在，则返回原值，否则去除前后空格
                 var pick = typeof(picks[j]) === 'undefined' ? picks[j] : picks[j].trim();
@@ -997,94 +915,29 @@ SVG.Wire = SVG.invent({
     inherit: SVG.Container,
     extend: {
         /**
-         * 弦数量
-         */
-        wireNum: 6,
-
-        /**
-         * 弦线宽
-         */
-        wireWidth: 1,
-
-        /**
-         * 弦距
-         */
-        wireDistance: 12,
-
-        /**
-         * 弦线长
-         */
-        wireLength: 72,
-
-        headWidth: function () {
-            return this.wireLength + this.wireWidth * 6;
-        },
-
-        headHeight: function(guitarNum) {
-            return (this.guitarNotationHeight() + this.notationDistance()) * guitarNum + this.numberedNotationHeight();
-        },
-
-        textFont: {
-            size: 20,                   //文字尺寸
-            anchor: 'middle'            //居中
-        },
-
-        /**
-         * 绘图起点
-         */
-        origin: {
-            x: 12,
-            y: 12
-        },
-
-        /**
-         * 吉他谱的高度
-         * @returns {number}
-         */
-        guitarNotationHeight: function () {
-            return this.wireNum * this.wireNum + this.wireWidth;
-        },
-
-        /**
-         * 谱间距
-         * @returns {number}
-         */
-        notationDistance: function () {
-            return this.wireDistance * 6;
-        },
-
-        /**
-         * 简谱的高度
-         * @returns {number}
-         */
-        numberedNotationHeight: function () {
-            return this.wireDistance * 2;
-        },
-
-        /**
          * 谱头部图形
          * @param guitarNum 吉他数
          * @returns {SVG.Wire}
          */
         head: function (guitarNum) {
-            var origin = this.origin;
+            var origin = guitarTab.origin;
 
-            var wireDistance = this.wireDistance;
+            var wireDistance = guitarTab.guitarWireDistance;
 
             //乐谱起始竖线宽度
-            var headLineWidth = this.wireWidth;
+            var headLineWidth = guitarTab.wireWidth;
             //乐谱起始竖线高度
-            var headLineHeight = this.headHeight(guitarNum);
+            var headLineHeight = guitarTab.headHeight(guitarNum);
 
             //大括号宽度
-            var bracketWidth = this.wireWidth * 3;
+            var bracketWidth = guitarTab.wireWidth * 3;
             //大括号高度
-            var bracketHeight = headLineHeight + this.wireDistance * 2;
+            var bracketHeight = headLineHeight + wireDistance * 2;
 
             //大括号顶端曲线起点
             var bracketTopPathOrigin = {
                 x: origin.x,
-                y: origin.y + this.wireDistance
+                y: origin.y + wireDistance
             };
             //大括号顶端绘图路径数组
             var bracketTopPathArray = [];
@@ -1111,7 +964,7 @@ SVG.Wire = SVG.invent({
             //乐谱起始竖线起点
             var headLineOrigin = {
                 x: origin.x + headLineWidth * 6,
-                y: bracketTopPathOrigin.y + this.wireDistance
+                y: bracketTopPathOrigin.y + wireDistance
             };
             //乐谱起始竖线
             this.rect(headLineWidth, headLineHeight).move(headLineOrigin.x, headLineOrigin.y);
@@ -1120,17 +973,17 @@ SVG.Wire = SVG.invent({
             for (var i = 0, n = guitarNum; i < n; i++) {
                 //起点
                 var x0 = headLineOrigin.x;
-                var y0 = headLineOrigin.y + (this.guitarNotationHeight() + this.notationDistance()) * i;
+                var y0 = headLineOrigin.y + (guitarTab.guitarNotationHeight() + guitarTab.notationDistance()) * i;
 
                 //绘制弦
-                for (var j = 0, m = this.wireNum; j < m; j++) {
-                    this.rect(this.wireLength, this.wireWidth).move(x0, y0 + this.wireDistance * j);
+                for (var j = 0, m = guitarTab.wireNumber; j < m; j++) {
+                    this.rect(guitarTab.guitarHeadWireLength, guitarTab.wireWidth).move(x0, y0 + wireDistance * j);
                 }
 
                 //字符TAB
                 var tabText = 'TAB';
                 for (var j = 0, m = tabText.length; j < m; j++) {
-                    this.text(tabText.charAt(j)).font(this.textFont).move(x0 + 18, y0 - 8 + 20 * j);
+                    this.text(tabText.charAt(j)).font(guitarTab.guitarHeadTextFont).move(x0 + 18, y0 - 8 + 20 * j);
                 }
             }
 
@@ -1140,30 +993,19 @@ SVG.Wire = SVG.invent({
         },
 
         bar: function (width) {
-            for (var i = 0, n = this.wireNum; i < n; i++) {
-                this.rect(width, this.wireWidth).move(0, i * this.wireDistance);
+            var wireNum = guitarTab.wireNumber;
+            var wireWidth = guitarTab.wireWidth;
+            var wireDistance = guitarTab.guitarWireDistance;
+
+            for (var i = 0, n = wireNum; i < n; i++) {
+                this.rect(width, wireWidth).move(0, i * wireDistance);
             }
-            this.rect(this.wireWidth, this.wireDistance * (this.wireNum - 1) + this.wireWidth).move(width - 1, 0);
+            this.rect(wireWidth, wireDistance * (wireNum - 1) + wireWidth).move(width - 1, 0);
 
             return this;
         }
     },
     construct: {
-        notationHeadWidth: function () {
-            return this.put(new SVG.Wire).headWidth();
-        },
-        notationHeadHeight: function (guitarNum) {
-            return this.put(new SVG.Wire).headHeight(guitarNum);
-        },
-        notationHeadDistance: function () {
-            return this.put(new SVG.Wire).notationDistance();
-        },
-        guitarTabHeight: function () {
-            return this.put(new SVG.Wire).guitarNotationHeight();
-        },
-        numberedTabHeight: function () {
-            return this.put(new SVG.Wire).numberedNotationHeight();
-        },
         notationHead: function (guitarNum) {
             return this.put(new SVG.Wire).head(guitarNum);
         },
@@ -1180,27 +1022,6 @@ SVG.NumberedMusicalNotation = SVG.invent({
     extend: {
 
         /**
-         * 绘图起点
-         */
-        origin: {
-            x: 0,
-            y: 0
-        },
-
-        /**
-         * 文字样式
-         */
-        textFont: {
-            size: 20,                   //文字尺寸
-            anchor: 'middle'            //居中
-        },
-
-        /**
-         * 高音、低音点的半径
-         */
-        dotRadius: 1.6,
-
-        /**
          * 将数字转成音符图形
          * @param num           数字
          * @param noteTimer     时值
@@ -1208,9 +1029,9 @@ SVG.NumberedMusicalNotation = SVG.invent({
          */
         turnNotation: function (num, noteTimer) {
 
-            var origin = this.origin;
-            var r = this.dotRadius;
-            var fontSize = this.textFont.size;
+            var r = guitarTab.numberedDotRadius;
+            var textFont = guitarTab.numberedTextFont
+            var fontSize = textFont.size;
 
             //音阶
             var musicalScale = 0;
@@ -1226,35 +1047,42 @@ SVG.NumberedMusicalNotation = SVG.invent({
             }
 
             //绘制数字
-            this.text(musicalScale + '').font(this.textFont).move(origin.x, origin.y);
+            this.text(musicalScale + '').font(textFont).move(0, 0);
 
-            if (128 % noteTimer > 0) {
-                this.circle(r * 3).fill('#000').move(origin.x + fontSize / 3, origin.y + fontSize / 2 - 2);
+            if (guitarTab.maxTimer % noteTimer > 0) {
+                //如果128对该音符时值取余大于0，说明该音符为浮点音符，在音符右侧绘制半音圆点
+                this.circle(guitarTab.dottedRadius * 2).fill('#000').move(fontSize / 3, fontSize / 2 - 2);
             }
 
-            // 高音或低音点的标记坐标x
-            var dotX = origin.x ;
-
-            var dotY = origin.y + fontSize - 2;
+            // 高音或低音点的标记坐标
+            var dotX = 0;
+            var dotY = fontSize - 2;
+            var lineDistance = r * 2;
+            var lineLength = fontSize / 2;
 
             // 音符时值小于等于16的，在底部绘制横线
             if (noteTimer <= 16) {
                 //计算底部横线数量，8分音符1条，16分音符2条，32分音符3条……
                 var lineNum = Math.log(Math.floor(16 / noteTimer)) / Math.log(2) + 1;
 
+                //将底部横线的距离和Y坐标挂在到this下
+                this.lineY = dotY + lineDistance;
+                this.lineDistance = lineDistance;
+                this.lineLength = lineLength;
+
                 for (var j = 0; j < lineNum; j++) {
 
-                    dotY = dotY + r * 2;
-                    this.line(0, 0, fontSize / 2, 0).stroke({width: 1}).move(dotX - fontSize / 4, dotY);
+                    dotY = dotY + lineDistance;
+                    //绘制底部横线
+                    this.line(0, 0, lineLength, 0).stroke({width: 1}).move(dotX - lineLength / 2, dotY);
                 }
             }
 
-            dotY = dotY - r * 2;
+            dotY = dotY - lineDistance;
             for (var i = 0; i < dotNum; i++){
-
                 if (num >= 0) {
                     // 绘制在音节上面
-                    dotY = origin.y - r * (i * 3 + 1);
+                    dotY = - r * (i * 3 + 1);
                 } else {
                     //绘制在音节下面
                     dotY = dotY + r * 3;
@@ -1262,8 +1090,6 @@ SVG.NumberedMusicalNotation = SVG.invent({
                 //绘制点
                 this.circle(r * 2).fill('#000').move(dotX - r, dotY);
             }
-
-            //this.move(- origin.x, - origin.y);
 
             return this;
         }

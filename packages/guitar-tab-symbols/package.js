@@ -13,8 +13,8 @@ Package.describe({
 Package.onUse(function(api) {
   api.versionsFrom('1.5.1');
   api.use(['ecmascript', 'jquery']);
-  api.addFiles(['guitar-tab-symbols.js'], 'client');
-  api.export('SVG', 'client');
+  api.addFiles(['parameters.js', 'guitar-tab-symbols.js'], 'client');
+  api.export(['SVG', 'parameters'], 'client');
 });
 
 Package.onTest(function(api) {

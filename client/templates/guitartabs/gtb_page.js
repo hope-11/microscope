@@ -4,6 +4,8 @@
 //import SVG from 'meteor/houpeng:gtb';
 //import { Drawing, GTS, Chord, d } from "meteor/houpeng:guitar-tab-symbols";
 
+var guitarTab = SVG.guitarTab;
+
 var chordData = {
     am: {
         name: 'Am',
@@ -154,7 +156,7 @@ var gtbData2 = {
     title: '平凡之路',
     artist: '朴树',
     notePerBeat: 4,
-    beatPerBar: 4,
+    beatPerBar: 2,
     bars: [
 
             {
@@ -213,8 +215,8 @@ var gtbData2 = {
                     ]
                 ],
                 numNotation: [
-                    {notation: 3, noteTimer: 32},
-                    {notation: 0},
+                    {notation: 8, noteTimer: 48},
+                    //{notation: 0},
                     {notation: 0}
                 ]
             },
@@ -405,13 +407,6 @@ Template.gtbPage.onRendered(function () {
 
     var draw = SVG('gtb-content');
 
-    //乐谱绘制零点
-    var tabParam = {
-        x0: 0,
-        y0: 100,
-        space: 140
-    };
-
     //var guitarNum = gtbData.bars.length;
 
     //定义乐谱页面宽度
@@ -428,13 +423,14 @@ Template.gtbPage.onRendered(function () {
     draw.notationHeadSymbols = draw.initNotationHeadSymbols();
 
     //乐谱头部宽度
-    var notationHeadWidth = draw.notationHeadSymbols[0].width;
-    var notationDistance = draw.notationHeadSymbols[0].notationDistance;
-    var guitarTabHeight = draw.notationHeadSymbols[0].guitarTabHeight;
-    var numberedTabHeight = draw.notationHeadSymbols[0].numberedTabHeight;
+    var notationHeadWidth = guitarTab.headWidth();
+    var notationDistance = guitarTab.notationDistance();
+    var guitarTabHeight = guitarTab.guitarNotationHeight();
+    var numberedTabHeight = guitarTab.numberedNotationHeight();
 
+console.log(draw.notationHeadSymbols[0])
     //定义每一行小节数
-    var barsInRowNum = 4;
+    var barsInRowNum = 6;
 
     //每一小节的宽度
     var barWidth = (pageWidth - notationHeadWidth) / barsInRowNum;
@@ -449,16 +445,25 @@ Template.gtbPage.onRendered(function () {
     //谱中的小节数
     var barsInTab = gtbData.bars.length;
 
+    //乐谱绘制零点
+    var tabParam = {
+        x0: 0,
+        y0: 100
+    };
+
 
     //行的绘图起点坐标，默认为乐谱绘图起点坐标
     var rowX = tabParam.x0;
     var rowY = tabParam.y0;
+
+    var rowSpace = 100 + numberedTabHeight;
 
     //按行遍历
     for (var rowSerial = 0, rowNum = Math.ceil(barsInTab / barsInRowNum); rowSerial < rowNum; rowSerial++) {
 
         //初始化小节内吉他数量，默认为1
         var guitarNum = 1;
+        var wordsRowNum = 1;
         //初始化吉他序号，初始为吉他数量-1
         var guitarSerial = guitarNum - 1;
         //当前行的小节数，默认为定义的每行小节数
@@ -485,6 +490,21 @@ Template.gtbPage.onRendered(function () {
                 //保存吉他数量
                 guitarSerial = guitarNum - 1 ;
             }
+
+            //遍历简谱数据
+            for (var j = 0, m = bar.numNotation.length; j < m; j++) {
+
+                //当前音符的歌词段落数
+                var currentWordsRowNum = typeof bar.numNotation[j].words === 'undefined' ? wordsRowNum : bar.numNotation[j].words.length;
+
+                //取最大的音符歌词段落数
+                if (wordsRowNum < currentWordsRowNum) {
+                    wordsRowNum = currentWordsRowNum;
+                }
+            }
+            //根据歌词段落数计算行间距
+            rowSpace = tabParam.y0 + numberedTabHeight * wordsRowNum;
+
         }
 
         //绘制乐谱头部
@@ -524,7 +544,8 @@ Template.gtbPage.onRendered(function () {
         }
 
         //行坐标下移
-        rowY = rowY + draw.notationHeadSymbols[guitarSerial].height + tabParam.space;
+        rowY = rowY +
+            draw.notationHeadSymbols[guitarSerial].height + rowSpace;
 
     }
 
