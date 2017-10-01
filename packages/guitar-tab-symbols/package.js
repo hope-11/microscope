@@ -13,7 +13,17 @@ Package.describe({
 Package.onUse(function(api) {
   api.versionsFrom('1.5.1');
   api.use(['ecmascript', 'jquery']);
-  api.addFiles(['parameters.js', 'guitar-tab-symbols.js'], 'client');
+  api.addFiles([
+        'parameters.js',
+        'tab.js',
+        'guitar-bar.js',
+        'guitar-chord.js',
+        'guitar-note.js',
+        'numbered-note.js',
+        'numbered-bar.js',
+        'guitar-wire.js',
+        'notation-link.js'
+      ], 'client');
   api.export(['SVG', 'parameters'], 'client');
 });
 

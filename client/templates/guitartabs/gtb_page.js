@@ -162,24 +162,24 @@ var gtbData2 = {
             {
                 guitars: [
                     [
-                        {picks: ['x','','','','',''], chord: chordData.em},
-                        {picks: ['','','x','','','']},
+                        {picks: ['','','x','','','x'], timer: 24, chord: chordData.em},
+                        {picks: ['','','x','','',''], timer: 8},
                         {picks: ['','','','','x','']},
                         {picks: ['','','','x','','']}
                     ],
                     [
-                        {picks: ['3','','','','','']},
-                        {picks: ['','','0','','','']},
-                        {picks: ['','','','','3','']},
-                        {picks: ['','','','1','','']}
+                        {picks: ['','','','P','',''], timer: 24},
+                        {picks: ['','','R','','','r'], timer: 8},
+                        {picks: ['','','r','','','R'], timer: 8},
+                        {picks: ['','','','x','','x'], timer: 24}
                     ]
                 ],
-                numNotation: [
-                    {notation: 0},
-                    {notation: 3, words: ['徘', '沸', '当']},
-                    {notation: 3, words: ['徊', '腾', '你']},
-                    {notation: 6, noteTimer: 8, words: ['着', '着', '仍']},
-                    {notation: 6, noteTimer: 8, words: ['的', '的', '然']}
+                numbereds: [
+                    {note: 0},
+                    {note: 3, words: ['徘', '沸', '当']},
+                    {note: 3, words: ['徊', '腾', '你']},
+                    {note: 6, timer: 8, words: ['着', '着', '仍']},
+                    {note: 6, timer: 8, words: ['的', '的', '然']}
                 ]
             },
             {
@@ -191,18 +191,18 @@ var gtbData2 = {
                         {picks: ['','','','x','','']}
                     ],
                     [
-                        {picks: ['3','','','','','']},
-                        {picks: ['','','0','','','']},
+                        {picks: ['3','','','','',''], timer: 8},
+                        {picks: ['','','0','','',''], timer: 24},
                         {picks: ['','','','','3','']},
                         {picks: ['','','','1','','']}
                     ]
                 ],
-                numNotation: [
-                    {notation: 6},
-                    {notation: 1, words: ['在', '不', '还']},
-                    {notation: 2, words: ['路', '安', '在']},
-                    {notation: 3, noteTimer: 8, words: ['上', '着', '幻']},
-                    {notation: 3, noteTimer: 8, words: ['的', '的', '想']}
+                numbereds: [
+                    {note: 6},
+                    {note: 1, words: ['在', '不', '还']},
+                    {note: 2, words: ['路', '安', '在']},
+                    {note: 3, timer: 8, words: ['上', '着', '幻']},
+                    {note: 3, timer: 8, words: ['的', '的', '想']}
                 ]
             },
             {
@@ -212,12 +212,19 @@ var gtbData2 = {
                         {picks: ['','','x','','','']},
                         {picks: ['','','','','x','']},
                         {picks: ['','','','x','','']}
+                    ],
+                    [
+                        {picks: ['','','','P','',''], timer: 8},
+                        {picks: ['','','R','','','r'], timer: 24},
+                        {picks: ['','','r','','','R'], timer: 24},
+                        {picks: ['','','','x','','x'], timer: 8}
                     ]
+
                 ],
-                numNotation: [
-                    {notation: 8, noteTimer: 48},
-                    //{notation: 0},
-                    {notation: 0}
+                numbereds: [
+                    {note: 8, timer: 48},
+                    //{note: 0},
+                    {note: 0}
                 ]
             },
             {
@@ -235,11 +242,11 @@ var gtbData2 = {
                         {picks: ['','','','1','','']}
                     ]
                 ],
-                numNotation: [
-                    {notation: 0},
-                    {notation: 0},
-                    {notation: 0},
-                    {notation: 0}
+                numbereds: [
+                    {note: 0},
+                    {note: 0},
+                    {note: 0},
+                    {note: 0}
                 ]
             },
             {
@@ -248,17 +255,29 @@ var gtbData2 = {
                         {picks: ['S','','','s','',''], chord: chordData.em},
                         {picks: ['S','','','s','','']},
                         {picks: ['','','S','','','s']},
-                        {picks: ['','','S','','','s'], noteTimer: 8},
-                        {picks: ['','','s','','','S'], noteTimer: 8}
+                        {picks: ['','','S','','','s'], timer: 8},
+                        {picks: ['','','s','','','S'], timer: 8}
+                    ],
+                    [
+                        {picks: ['','','S','','','s'], timer: 8},
+                        {picks: ['','','S','','','s'], timer: 8},
+                        {picks: ['','','S','','','s'], timer: 4},
+                        {picks: ['','','s','','','S'], timer: 4},
+                        {picks: ['','','S','','','s'], timer: 8},
+                        {picks: ['','','S','','','s'], timer: 8},
+                        {picks: ['','','S','','','s'], timer: 8},
+                        {picks: ['','','S','','','s'], timer: 4},
+                        {picks: ['','','s','','','S'], timer: 4},
+                        {picks: ['','','S','','','s'], timer: 8}
                     ]
                 ],
-                numNotation: [
-                    {notation: 8, words: ['跨', '毁', '跨']},
-                    {notation: 7, noteTimer: 8, words: ['过', '了', '过']},
-                    {notation: 8, noteTimer: 8, words: ['山', '我', '山']},
-                    {notation: 8, words: []},
-                    {notation: 5, noteTimer: 8, words: ['和', '的', '和']},
-                    {notation: 6, noteTimer: 8, words: ['大', '一', '大']}
+                numbereds: [
+                    {note: 8, words: ['跨', '毁', '跨']},
+                    {note: 7, timer: 8, words: ['过', '了', '过']},
+                    {note: 8, timer: 8, words: ['山', '我', '山']},
+                    {note: 8, words: []},
+                    {note: 5, timer: 8, words: ['和', '的', '和']},
+                    {note: 6, timer: 8, words: ['大', '一', '大']}
                 ]
             },
             {
@@ -267,14 +286,23 @@ var gtbData2 = {
                         {picks: ['S','','','s','',''], chord: chordData.c},
                         {picks: ['S','','','s','','']},
                         {picks: ['','','S','','','s']},
-                        {picks: ['','','S','','','s'], noteTimer: 8},
-                        {picks: ['','','s','','','S'], noteTimer: 8}
+                        {picks: ['','','S','','','s'], timer: 8},
+                        {picks: ['','','s','','','S'], timer: 8}
+                    ],
+                    [
+                        {picks: ['','','S','','','s'], timer: 8},
+                        {picks: ['','','s','','','S'], timer: 8},
+                        {picks: ['','','S','','','s'], timer: 8},
+                        {picks: ['','','S','','','s'], timer: 8},
+                        {picks: ['','','S','','','s'], timer: 8},
+                        {picks: ['','','s','','','S'], timer: 16},
+                        {picks: ['','','s','','','S'], timer: 8}
                     ]
                 ],
-                numNotation: [
-                    {notation: 6, noteTimer: 32, words: ['海', '切', '海']},
-                    {notation: 4, words: ['也', '只', '也']},
-                    {notation: 3, words: ['穿', '想', '穿']}
+                numbereds: [
+                    {note: 6, timer: 32, words: ['海', '切', '海']},
+                    {note: 4, words: ['也', '只', '也']},
+                    {note: 3, words: ['穿', '想', '穿']}
                 ]
             },
             {
@@ -283,15 +311,15 @@ var gtbData2 = {
                         {picks: ['S','','','s','',''], chord: chordData.g},
                         {picks: ['S','','','s','','']},
                         {picks: ['','','S','','','s']},
-                        {picks: ['','','S','','','s'], noteTimer: 8},
-                        {picks: ['','','s','','','S'], noteTimer: 8}
+                        {picks: ['','','S','','','s'], timer: 8},
+                        {picks: ['','','s','','','S'], timer: 8}
                     ]
                 ],
-                numNotation: [
-                    {notation: 3, words: ['过', '永', '过']},
-                    {notation: 3, words: ['人', '远', '人']},
-                    {notation: 4, words: ['山', '的', '山']},
-                    {notation: 3, words: ['人', '离', '人']}
+                numbereds: [
+                    {note: 3, words: ['过', '永', '过']},
+                    {note: 3, words: ['人', '远', '人']},
+                    {note: 4, words: ['山', '的', '山']},
+                    {note: 3, words: ['人', '离', '人']}
                 ]
             }
 
@@ -306,16 +334,16 @@ var gtbData3={
     bars: [       //吉他谱谱，可能有多个吉他谱和简谱
         [
             [
-                {picks: ['','x','','','',''], noteTimer: 4, chord: chordData.am},
-                {picks: ['','x','','','',''], noteTimer: 4},
-                {picks: ['','','x','','',''], noteTimer: 4},
-                {picks: ['','','x','','',''], noteTimer: 4},
+                {picks: ['','x','','','',''], timer: 4, chord: chordData.am},
+                {picks: ['','x','','','',''], timer: 4},
+                {picks: ['','','x','','',''], timer: 4},
+                {picks: ['','','x','','',''], timer: 4},
                 {picks: ['','','','x','','']},
                 {picks: ['','','','x','','']},
                 {picks: ['','','','','x','']},
                 {picks: ['','','','x','','']},
-                {picks: ['','','x','','',''], noteTimer: 8},
-                {picks: ['','','x','','',''], noteTimer: 8},
+                {picks: ['','','x','','',''], timer: 8},
+                {picks: ['','','x','','',''], timer: 8},
             ],
             [
                 {picks: ['','x','','','',''], chord: chordData.f7},
@@ -327,51 +355,23 @@ var gtbData3={
             ],
             [
                 {picks: ['','x','','','',''], chord: chordData.am},
-                {picks: ['','','x','','',''], noteTimer: 8},
+                {picks: ['','','x','','',''], timer: 8},
                 {picks: ['','','','x','','']},
-                {picks: ['','','x','','',''], noteTimer: 8},
+                {picks: ['','','x','','',''], timer: 8},
                 {picks: ['','','','','x','']},
                 {picks: ['','','','x','','']},
-                {picks: ['','','x','','',''], noteTimer: 8},
-                {picks: ['','','x','','',''], noteTimer: 8}
+                {picks: ['','','x','','',''], timer: 8},
+                {picks: ['','','x','','',''], timer: 8}
             ],
             [
-                {picks: ['','x','','','',''], noteTimer: 8, chord: chordData.am},
-                {picks: ['','x','','','',''], noteTimer: 8},
+                {picks: ['','x','','','',''], timer: 8, chord: chordData.am},
+                {picks: ['','x','','','',''], timer: 8},
                 {picks: ['','','x','','','']},
                 {picks: ['','','','x','','']},
                 {picks: ['','','','','x','']},
                 {picks: ['','','','x','','']},
-                {picks: ['','','x','','',''], noteTimer: 8},
-                {picks: ['','','x','','',''], noteTimer: 8},
-            ],
-            [
-                {picks: ['','x','','','',''], chord: chordData.f7},
-                {picks: ['','','x','','','']},
-                {picks: ['','','','x','','']},
-                {picks: ['','','','','x','']},
-                {picks: ['','','','x','','']},
-                {picks: ['','','x','','','']}
-            ],
-            [
-                {picks: ['','x','','','',''], noteTimer: 8, chord: chordData.am},
-                {picks: ['','','x','','',''], noteTimer: 8},
-                {picks: ['','','x','','','']},
-                {picks: ['','','','x','','']},
-                {picks: ['','','','','x','']},
-                {picks: ['','','','x','','']},
-                {picks: ['','','x','','',''], noteTimer: 8},
-                {picks: ['','','x','','',''], noteTimer: 8}
-            ],
-            [
-                {picks: ['','x','','','',''], noteTimer: 8, chord: chordData.am},
-                {picks: ['','x','','','',''], noteTimer: 8},
-                {picks: ['','','x','','','']},
-                {picks: ['','','','x','','']},
-                {picks: ['','','','','x','']},
-                {picks: ['','','','x','','']},
-                {picks: ['','','x','','',''], noteTimer: 8},
-                {picks: ['','','x','','',''], noteTimer: 8},
+                {picks: ['','','x','','',''], timer: 8},
+                {picks: ['','','x','','',''], timer: 8},
             ],
             [
                 {picks: ['','x','','','',''], chord: chordData.f7},
@@ -382,14 +382,42 @@ var gtbData3={
                 {picks: ['','','x','','','']}
             ],
             [
-                {picks: ['','x','','','',''], noteTimer: 8, chord: chordData.am},
-                {picks: ['','','x','','',''], noteTimer: 8},
+                {picks: ['','x','','','',''], timer: 8, chord: chordData.am},
+                {picks: ['','','x','','',''], timer: 8},
                 {picks: ['','','x','','','']},
                 {picks: ['','','','x','','']},
                 {picks: ['','','','','x','']},
                 {picks: ['','','','x','','']},
-                {picks: ['','','x','','',''], noteTimer: 8},
-                {picks: ['','','S','','','s'], noteTimer: 8}
+                {picks: ['','','x','','',''], timer: 8},
+                {picks: ['','','x','','',''], timer: 8}
+            ],
+            [
+                {picks: ['','x','','','',''], timer: 8, chord: chordData.am},
+                {picks: ['','x','','','',''], timer: 8},
+                {picks: ['','','x','','','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','','','x','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','x','','',''], timer: 8},
+                {picks: ['','','x','','',''], timer: 8},
+            ],
+            [
+                {picks: ['','x','','','',''], chord: chordData.f7},
+                {picks: ['','','x','','','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','','','x','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','x','','','']}
+            ],
+            [
+                {picks: ['','x','','','',''], timer: 8, chord: chordData.am},
+                {picks: ['','','x','','',''], timer: 8},
+                {picks: ['','','x','','','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','','','x','']},
+                {picks: ['','','','x','','']},
+                {picks: ['','','x','','',''], timer: 8},
+                {picks: ['','','S','','','s'], timer: 8}
             ]
 
         ],
@@ -407,165 +435,21 @@ Template.gtbPage.onRendered(function () {
 
     var draw = SVG('gtb-content');
 
-    //var guitarNum = gtbData.bars.length;
-
     //定义乐谱页面宽度
     var pageWidth = $('#gtb-content').width();
 
-
-    //初始化击弦图形
-    draw.pickSymbols = draw.initPickSymbols();
-
-    //初始化和弦图形
-    draw.chordSymbols = draw.initChordSymbols();
-
-    //初始化吉他谱头部图形
-    draw.notationHeadSymbols = draw.initNotationHeadSymbols();
-
-    //乐谱头部宽度
-    var notationHeadWidth = guitarTab.headWidth();
-    var notationDistance = guitarTab.notationDistance();
-    var guitarTabHeight = guitarTab.guitarNotationHeight();
-    var numberedTabHeight = guitarTab.numberedNotationHeight();
-
-console.log(draw.notationHeadSymbols[0])
     //定义每一行小节数
     var barsInRowNum = 6;
 
-    //每一小节的宽度
-    var barWidth = (pageWidth - notationHeadWidth) / barsInRowNum;
-    //初始化小节线
-    draw.wireBarSymbol = draw.initWireBarSymbol(barWidth);
+    var tab = draw.tabed(gtbData, pageWidth, barsInRowNum);
 
-    //每小节拍数
-    var beatPerBar = gtbData.beatPerBar;
-    //几分音符为一拍
-    var notePerBeat = gtbData.notePerBeat;
+    draw.path('M6,-1.05L10.95,-6L12.05,-4.9L7.1,0L11.95,4.9L10.85,6L6,1.1L1.05,5.95L0.05,4.85L4.9,0L0,-4.85L1.05,-5.95L6,-1.05')
+        .move(50, 50);
 
-    //谱中的小节数
-    var barsInTab = gtbData.bars.length;
+    draw.path('M7.5,-28.25Q8.6,-26.5 9.7,-23.7Q10.85,-20.85 10.9,-17.7Q10.7,-13.7 8.05,-10.5L3.45,-5.3Q1.95,-3.4 1.6,-1.55L1.05,1.75L0,1.75L0,-9.75L1.05,-9.75L1.05,-8.95Q2.75,-9.15 4.45,-10.15Q6.15,-11.15 7.3,-12.65Q9.4,-15.35 9.55,-18.75Q9.55,-21.65 8.65,-24.05L6.9,-28L7.5,-28.25')
+        .move(60, 60);
 
-    //乐谱绘制零点
-    var tabParam = {
-        x0: 0,
-        y0: 100
-    };
+    draw.path('M30 30L50 30M60 40L70 70').stroke('black').fill('transparent')
 
-
-    //行的绘图起点坐标，默认为乐谱绘图起点坐标
-    var rowX = tabParam.x0;
-    var rowY = tabParam.y0;
-
-    var rowSpace = 100 + numberedTabHeight;
-
-    //按行遍历
-    for (var rowSerial = 0, rowNum = Math.ceil(barsInTab / barsInRowNum); rowSerial < rowNum; rowSerial++) {
-
-        //初始化小节内吉他数量，默认为1
-        var guitarNum = 1;
-        var wordsRowNum = 1;
-        //初始化吉他序号，初始为吉他数量-1
-        var guitarSerial = guitarNum - 1;
-        //当前行的小节数，默认为定义的每行小节数
-        var barsInCurrentRowNum = barsInRowNum;
-
-        //如果是最后一行，当前行的小节数为 总小节数 对 每行小节数 取余
-        if (rowSerial === rowNum - 1) {
-            barsInCurrentRowNum = barsInTab % barsInRowNum;
-        }
-
-        //遍历一行内的小节，把最大数量的吉他数-1保存到吉他序号
-        for (var i = 0; i < barsInCurrentRowNum; i++) {
-
-            //小节序号
-            var barSerial = rowSerial * barsInRowNum + i;
-
-            //乐谱小节
-            var bar = gtbData.bars[barSerial];
-
-            //该小节吉他数量
-            guitarNum = bar.guitars.length;
-
-            if (guitarSerial < guitarNum - 1) {
-                //保存吉他数量
-                guitarSerial = guitarNum - 1 ;
-            }
-
-            //遍历简谱数据
-            for (var j = 0, m = bar.numNotation.length; j < m; j++) {
-
-                //当前音符的歌词段落数
-                var currentWordsRowNum = typeof bar.numNotation[j].words === 'undefined' ? wordsRowNum : bar.numNotation[j].words.length;
-
-                //取最大的音符歌词段落数
-                if (wordsRowNum < currentWordsRowNum) {
-                    wordsRowNum = currentWordsRowNum;
-                }
-            }
-            //根据歌词段落数计算行间距
-            rowSpace = tabParam.y0 + numberedTabHeight * wordsRowNum;
-
-        }
-
-        //绘制乐谱头部
-        draw.use(draw.notationHeadSymbols[guitarSerial]).move(rowX, rowY);
-
-        //遍历一行内的小节，绘制该行所有小节
-        for (var i = 0; i < barsInCurrentRowNum; i++) {
-
-            //小节序号
-            var barSerial = rowSerial * barsInRowNum + i;
-
-            //乐谱小节
-            var bar = gtbData.bars[barSerial];
-
-            //小节每一把吉他的绘图起点坐标
-            var barX = rowX + notationHeadWidth + barWidth * i;
-            var barY = rowY;
-
-            //按照该行最大吉他数量绘制小节
-            for (var j = 0; j <= guitarSerial; j++) {
-
-                //小节内吉他谱的数据
-                var guitar = bar.guitars[j];
-
-                barY = rowY + (guitarTabHeight + notationDistance) * j;
-
-                //绘制小节
-                draw.drawGuitarBar(draw, barX, barY, barWidth, guitar, beatPerBar, notePerBeat);
-            }
-
-            var numNotation = bar.numNotation;
-
-            barY = barY + guitarTabHeight + notationDistance;
-
-            draw.drawNumberedBar(draw, barX, barY, barWidth, numNotation, beatPerBar, notePerBeat);
-
-        }
-
-        //行坐标下移
-        rowY = rowY +
-            draw.notationHeadSymbols[guitarSerial].height + rowSpace;
-
-    }
-
-    /*
-    for (var i = -14; i <= -8; i++){
-        draw.notation(i, 8).move(20 * (i + 22), 220);
-    }
-    for (var i = -7; i <= -1; i++){
-        draw.notation(i, 12).move(20 * (i + 22), 220);
-    }
-    for (var i = 0; i <= 7; i++){
-        draw.notation(i, 4).move(20 * (i + 22), 220);
-    }
-    for (var i = 8; i <= 14; i++){
-        draw.notation(i, 2).move(20 * (i + 22), 220);
-    }
-    for (var i = 15; i <= 21; i++){
-        draw.notation(i, 1).move(20 * (i + 22), 220);
-    }
-    */
-
-    draw.size(pageWidth, rowY);
+    draw.size(pageWidth, tab.height);
 });

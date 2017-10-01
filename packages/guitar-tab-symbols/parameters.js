@@ -2,12 +2,14 @@
  * Created by houpeng on 2017/9/22.
  */
 
-export var guitarTab = {
+export let guitarTab = {
 
     //全局
 
     //弦数量
-    wireNumber: 6,
+    wireNum: 6,
+    //品位数量
+    fredNum: 24,
     //弦线宽
     wireWidth: 1,
     //绘图线样式
@@ -16,6 +18,8 @@ export var guitarTab = {
     origin: {x: 50, y: 50},
     //符点半径
     dottedRadius: 2,
+    //浮点距离音符的距离
+    dotDistance: 8,
     //最大时值
     maxTimer: 128,
 
@@ -38,6 +42,10 @@ export var guitarTab = {
     pickHeight: 12,
     //数字文字样式
     pickNumFont: {size: 15, anchor: 'middle'},
+    //吉他音符符尾线宽
+    guitarNoteHookWidth: 2,
+    //吉他音符符尾间距
+    guitarNoteHookDistance: 4,
 
     //吉他谱
 
@@ -45,8 +53,12 @@ export var guitarTab = {
     guitarWireDistance: 12,
     //谱头部弦长
     guitarHeadWireLength: 72,
+    //吉他谱头部文字
+    guitarHeadText: 'TAB',
     //谱头部文字（TAB）样式
     guitarHeadTextFont: {size: 20, anchor: 'middle'},
+
+
 
     //简谱
 
@@ -62,10 +74,10 @@ export var guitarTab = {
      */
     chordFredNumber: function (chord) {
         //默认3个品格
-        var num = 3;
+        let num = 3;
         //遍历和弦指位元素，有品位超过3的，则取代
         chord.fingers.forEach(function(finger){
-            var fred = finger.fred;
+            let fred = finger.fred;
             if (fred > num){
                 num = fred;
             }
@@ -78,8 +90,9 @@ export var guitarTab = {
      * @private
      */
     chordGridWidth: function () {
-        return this.chordWireDistance * (this.wireNumber - 1) + this.wireWidth;
+        return this.chordWireDistance * (this.wireNum - 1) + this.wireWidth;
     },
+
     /**
      * 获取网格高度
      * @returns {number}
@@ -89,14 +102,18 @@ export var guitarTab = {
         return this.chordFredDistance * this.chordFredNumber(chord);
     },
 
+    chordHeight: function () {
+        return this.chordNameTextFont.size + this.chordFredDistance * 6;
+    },
+
     /**
      * 获取和弦名称文字位置
      * @returns {{x: number, y: number}}
      * @private
      */
     chordNameTextPosition: function () {
-        var x = this.origin.x + this.chordGridWidth() / 2;
-        var y = this.origin.y - this.chordNameTextFont.size;
+        let x = this.chordGridWidth() / 2;
+        let y = - this.chordNameTextFont.size;
         return {x: x, y: y};
     },
 
@@ -109,9 +126,9 @@ export var guitarTab = {
      */
     chordFingerCirclePosition: function (fred, pick) {
         //指位编号所在弦的位置坐标，即X轴坐标，（弦总数 - 弦号） * 弦距 - 指圆半径
-        var x = this.origin.x + (this.wireNumber - pick) * this.chordWireDistance - this.chordFingerCircleRadius;
+        let x = (this.wireNum - pick) * this.chordWireDistance - this.chordFingerCircleRadius;
         //指位编号所在品格的位置坐标，即Y轴坐标，（品位号 * 品距） - 半个品距 - 指圆半径
-        var y = this.origin.y + fred * this.chordFredDistance - this.chordFredDistance / 2 - this.chordFingerCircleRadius;
+        let y = fred * this.chordFredDistance - this.chordFredDistance / 2 - this.chordFingerCircleRadius;
         return {x: x, y: y};
 
     },
@@ -120,7 +137,7 @@ export var guitarTab = {
      * 头部宽度
      * @returns {number}
      */
-    headWidth: function () {
+    notationHeadWidth: function () {
         return this.guitarHeadWireLength + this.wireWidth * 6;
     },
 
@@ -129,7 +146,7 @@ export var guitarTab = {
      * @param guitarNum
      * @returns {*}
      */
-    headHeight: function(guitarNum) {
+    notationHeadHeight: function(guitarNum) {
         return (this.guitarNotationHeight() + this.notationDistance()) * guitarNum + this.numberedNotationHeight();
     },
 
@@ -138,7 +155,7 @@ export var guitarTab = {
      * @returns {number}
      */
     guitarNotationHeight: function () {
-        return (this.wireNumber - 1) * this.guitarWireDistance;
+        return (this.wireNum - 1) * this.guitarWireDistance;
     },
 
     /**
@@ -157,6 +174,62 @@ export var guitarTab = {
         return this.guitarWireDistance * 2;
     },
 
+    /**
+     * 每一拍的时值
+     * @param notePerBeat
+     * @returns {number}
+     */
+    timerPerBeat: function (notePerBeat) {
+        return this.maxTimer / notePerBeat;
+    },
+
+    /**
+     * 将多少个音符连接成一个小组
+     * @param beatPerBar
+     * @returns {number}
+     */
+    noteJoin: function (beatPerBar) {
+        //如果每小节大于等于6拍，并且是3的倍数，则3拍为一组连接
+        if (beatPerBar >= 6 && beatPerBar % 3 === 0){
+            return 3;
+        } else {
+            return 1;
+        }
+    },
+
+    /**
+     * 根据音符时值计算符尾数量，8分音符1条，16分音符2条，32分音符3条……
+     * @param timer
+     * @returns {number}
+     */
+    noteHookNum: function (timer) {
+        if (timer < 32) {
+
+            return Math.log(Math.ceil(16 / timer)) / Math.log(2) + 1;
+        } else {
+            return 0;
+        }
+    },
+
+    /**
+     * 默认为八分音符，即时值为16
+     * @param timer
+     * @returns {number}
+     */
+    noteTimer: function (timer) {
+        return typeof(timer) === 'undefined' ? 16 : timer;
+    },
+
+    /**
+     * 根据音符时值判断该音符是否为浮点音符
+     * @param timer
+     * @returns {boolean}
+     */
+    isDottedNote: function (timer) {
+        return this.maxTimer % timer > 0;
+    }
 
 };
+
+//SVG.guitarTab = guitarTab;
 
